@@ -11,7 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+    //
     }
 
     /**
@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        view()->composer('layouts.admin', function ($view) {
+            $view->with('pending_approvals_count', \App\Models\User::where('is_admin', false)->where('status', 'pending')->count());
+        });
     }
 }

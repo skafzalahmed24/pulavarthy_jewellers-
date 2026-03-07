@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class CustomerController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $customers = User::where('is_admin', false)->latest()->paginate(10);
+        return view('admin.customers.index', compact('customers'));
+    }
+
+    /**
+     * Display a listing of pending customers for approval.
+     */
+    public function approvals()
+    {
+        $customers = User::where('is_admin', false)->where('status', 'pending')->latest()->paginate(10);
+        return view('admin.customers.approvals', compact('customers'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('admin.customers.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'mobile' => 'required|string|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $schemeNumber = null;
+        $plan = \App\Models\InvestmentPlan::where('name', $request->plan_category)->first();
+        if ($plan && $plan->scheme_prefix) {
+            $prefix = $plan->scheme_prefix;
+            $lastUser = User::where('scheme_number', 'LIKE', $prefix . '%')
+                ->orderBy('scheme_number', 'desc')
+                ->first();
+
+            $newNumber = 1;
+            if ($lastUser) {
+                $lastNumber = intval(substr($lastUser->scheme_number, strlen($prefix)));
+                $newNumber = $lastNumber + 1;
+            }
+
+            $schemeNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        }
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'mobile' => $request->mobile,
+            'password' => Hash::make($request->password),
+            'address' => $request->address,
+            'city' => $request->city,
+            'pincode' => $request->pincode,
+            'state' => $request->state,
+            'identity_proof' => $request->identity_proof,
+            'plan_category' => $request->plan_category,
+            'nominee_name' => $request->nominee_name,
+            'nominee_relationship' => $request->nominee_relationship,
+            'nominee_contact' => $request->nominee_contact,
+            'scheme_number' => $schemeNumber,
+            'status' => 'approved', // Admin manual additions are auto-approved
+            'is_admin' => false,
+        ]);
+
+        return redirect()->route('admin.customers.index')->with('success', 'Customer created successfully.');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $customer = User::findOrFail($id);
+        $plans = \App\Models\InvestmentPlan::all();
+        return view('admin.customers.edit', compact('customer', 'plans'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $customer = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $customer->id,
+            'mobile' => 'required|string|unique:users,mobile,' . $customer->id,
+            'status' => 'required|in:pending,approved,rejected',
+            'address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'pincode' => 'nullable|string|max:20',
+            'state' => 'nullable|string|max:255',
+            'identity_proof' => 'nullable|string|max:255',
+            'plan_category' => 'nullable|string|max:255',
+            'nominee_name' => 'nullable|string|max:255',
+            'nominee_relationship' => 'nullable|string|max:255',
+            'nominee_contact' => 'nullable|string|max:20',
+        ]);
+
+        $data = $request->only([
+            'name', 'email', 'mobile', 'status', 'address', 'city',
+            'pincode', 'state', 'identity_proof', 'plan_category',
+            'nominee_name', 'nominee_relationship',
+            'nominee_contact'
+        ]);
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        // Logic to generate scheme number on approval
+        if ($data['status'] === 'approved' && is_null($customer->scheme_number)) {
+            $plan = \App\Models\InvestmentPlan::where('name', $customer->plan_category)->first();
+            if ($plan && $plan->scheme_prefix) {
+                $prefix = $plan->scheme_prefix;
+                $lastUser = User::where('scheme_number', 'LIKE', $prefix . '%')
+                    ->orderBy('scheme_number', 'desc')
+                    ->first();
+
+                $newNumber = 1;
+                if ($lastUser) {
+                    $lastNumber = intval(substr($lastUser->scheme_number, strlen($prefix)));
+                    $newNumber = $lastNumber + 1;
+                }
+
+                $data['scheme_number'] = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            }
+        }
+
+        $customer->update($data);
+
+        return redirect()->route('admin.customers.index')->with('success', 'Customer updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $customer = User::findOrFail($id);
+        $customer->update(['status' => 'rejected']);
+
+        return redirect()->route('admin.customers.index')->with('success', 'Customer has been marked as rejected.');
+    }
+}

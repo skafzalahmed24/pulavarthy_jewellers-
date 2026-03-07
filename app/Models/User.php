@@ -21,6 +21,19 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
+        'mobile',
+        'address',
+        'city',
+        'pincode',
+        'state',
+        'identity_proof',
+        'plan_category',
+        'nominee_name',
+        'nominee_relationship',
+        'nominee_contact',
+        'status',
+        'scheme_number',
     ];
 
     /**
