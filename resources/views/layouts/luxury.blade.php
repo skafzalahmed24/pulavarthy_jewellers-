@@ -13,6 +13,8 @@
         rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/luxury-style.css') }}">
     @yield('styles')
@@ -24,18 +26,22 @@
             <a href="{{ url('/') }}">
                 <img src="{{ asset('img/logo.webp') }}" alt="XYZ JEWELLERS" class="logo-img">
             </a>
-            <nav>
-                <ul>
-                    <li><a href="{{ url('/') }}">Home</a></li>
-                    <li><a href="{{ url('/purchase-plan') }}">Jewellery Purchase Plan</a></li>
-                    <!-- <li><a href="{{ url('/purchase-plan#pay-now') }}">My Plan Login</a></li> -->
-                    <li><a href="#footer">Contact</a></li>
-                </ul>
-            </nav>
+            <div class="nav-right">
+                <nav>
+                    <ul>
+                        <li><a href="{{ url('/') }}"><i class="fas fa-home" style="margin-right: 8px;"></i>Home</a></li>
+                        <li><a href="{{ url('/purchase-plan') }}"><i class="fas fa-gem" style="margin-right: 8px;"></i>Jewellery Purchase Plan</a></li>
+                        <li><a href="#footer"><i class="fas fa-phone-alt" style="margin-right: 8px;"></i>Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main>
+    <main style="margin-top: var(--header-height);">
         @yield('content')
     </main>
 
@@ -71,6 +77,8 @@
         </div>
     </footer>
 
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="{{ asset('js/luxury-script.js') }}"></script>
     <script>

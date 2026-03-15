@@ -90,6 +90,25 @@ class AdminController extends Controller
         return back()->with('success', 'Terms and conditions updated successfully.');
     }
 
+    public function approveGrace($id)
+    {
+        $payment = \App\Models\Payment::findOrFail($id);
+        $payment->grace_extension_status = 'approved';
+        $payment->grace_end_date = \Carbon\Carbon::parse($payment->grace_end_date)->addDays(15);
+        $payment->save();
+
+        return back()->with('success', 'Grace period extended by 15 days.');
+    }
+
+    public function rejectGrace($id)
+    {
+        $payment = \App\Models\Payment::findOrFail($id);
+        $payment->grace_extension_status = 'rejected';
+        $payment->save();
+
+        return back()->with('success', 'Grace period extension rejected.');
+    }
+
     public function logout()
     {
         auth()->logout();

@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class UserScheme extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'scheme_id',
+        'scheme_number',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function investmentPlan()
+    {
+        return $this->belongsTo(InvestmentPlan::class, 'scheme_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+}

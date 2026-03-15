@@ -50,20 +50,20 @@ class CustomerController extends Controller
         $plan = \App\Models\InvestmentPlan::where('name', $request->plan_category)->first();
         if ($plan && $plan->scheme_prefix) {
             $prefix = $plan->scheme_prefix;
-            $lastUser = User::where('scheme_number', 'LIKE', $prefix . '%')
+            $lastUserScheme = \App\Models\UserScheme::where('scheme_number', 'LIKE', $prefix . '%')
                 ->orderBy('scheme_number', 'desc')
                 ->first();
 
             $newNumber = 1;
-            if ($lastUser) {
-                $lastNumber = intval(substr($lastUser->scheme_number, strlen($prefix)));
+            if ($lastUserScheme) {
+                $lastNumber = intval(substr($lastUserScheme->scheme_number, strlen($prefix)));
                 $newNumber = $lastNumber + 1;
             }
 
             $schemeNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
         }
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'mobile' => $request->mobile,
@@ -73,14 +73,20 @@ class CustomerController extends Controller
             'pincode' => $request->pincode,
             'state' => $request->state,
             'identity_proof' => $request->identity_proof,
-            'plan_category' => $request->plan_category,
             'nominee_name' => $request->nominee_name,
             'nominee_relationship' => $request->nominee_relationship,
             'nominee_contact' => $request->nominee_contact,
-            'scheme_number' => $schemeNumber,
             'status' => 'approved', // Admin manual additions are auto-approved
             'is_admin' => false,
         ]);
+
+        if ($plan) {
+            \App\Models\UserScheme::create([
+                'user_id' => $user->id,
+                'scheme_id' => $plan->id,
+                'scheme_number' => $schemeNumber,
+            ]);
+        }
 
         return redirect()->route('admin.customers.index')->with('success', 'Customer created successfully.');
     }
@@ -120,7 +126,7 @@ class CustomerController extends Controller
 
         $data = $request->only([
             'name', 'email', 'mobile', 'status', 'address', 'city',
-            'pincode', 'state', 'identity_proof', 'plan_category',
+            'pincode', 'state', 'identity_proof', 
             'nominee_name', 'nominee_relationship',
             'nominee_contact'
         ]);
@@ -129,26 +135,44 @@ class CustomerController extends Controller
             $data['password'] = Hash::make($request->password);
         }
 
-        // Logic to generate scheme number on approval
-        if ($data['status'] === 'approved' && is_null($customer->scheme_number)) {
-            $plan = \App\Models\InvestmentPlan::where('name', $customer->plan_category)->first();
-            if ($plan && $plan->scheme_prefix) {
-                $prefix = $plan->scheme_prefix;
-                $lastUser = User::where('scheme_number', 'LIKE', $prefix . '%')
-                    ->orderBy('scheme_number', 'desc')
-                    ->first();
+        $customer->update($data);
 
-                $newNumber = 1;
-                if ($lastUser) {
-                    $lastNumber = intval(substr($lastUser->scheme_number, strlen($prefix)));
-                    $newNumber = $lastNumber + 1;
+        // Update plan category if provided
+        if ($request->filled('plan_category')) {
+            $plan = \App\Models\InvestmentPlan::where('name', $request->plan_category)->first();
+            if ($plan) {
+                $userScheme = $customer->userSchemes()->first();
+                if ($userScheme) {
+                    $userScheme->update(['scheme_id' => $plan->id]);
+                } else {
+                    $customer->userSchemes()->create(['scheme_id' => $plan->id, 'scheme_number' => null]);
                 }
-
-                $data['scheme_number'] = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
             }
         }
 
-        $customer->update($data);
+        // Logic to generate scheme number on approval
+        if ($data['status'] === 'approved') {
+            $pendingScheme = $customer->userSchemes()->whereNull('scheme_number')->first();
+            if ($pendingScheme) {
+                $plan = $pendingScheme->investmentPlan;
+                if ($plan && $plan->scheme_prefix) {
+                    $prefix = $plan->scheme_prefix;
+                    $lastScheme = \App\Models\UserScheme::where('scheme_number', 'LIKE', $prefix . '%')
+                        ->orderBy('scheme_number', 'desc')
+                        ->first();
+
+                    $newNumber = 1;
+                    if ($lastScheme) {
+                        $lastNumber = intval(substr($lastScheme->scheme_number, strlen($prefix)));
+                        $newNumber = $lastNumber + 1;
+                    }
+
+                    $pendingScheme->update([
+                        'scheme_number' => $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT),
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('admin.customers.index')->with('success', 'Customer updated successfully.');
     }

@@ -20,7 +20,7 @@
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #888;">Scheme Number
                         (Generated on Approval)</label>
-                    <input type="text" class="form-control" value="{{ $customer->scheme_number ?? 'Pending Approval' }}"
+                    <input type="text" class="form-control" value="{{ $customer->userSchemes->first()?->scheme_number ?? 'Pending Approval' }}"
                         readonly
                         style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background-color: #f9f9f9; cursor: not-allowed; font-weight: 700; color: var(--accent-color);">
                 </div>
@@ -102,7 +102,7 @@
                     <select name="plan_category" class="form-control"
                         style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
                         @foreach($plans as $plan)
-                        <option value="{{ $plan->name }}" {{ $customer->plan_category == $plan->name ? 'selected' : ''
+                        <option value="{{ $plan->name }}" {{ ($customer->userSchemes->first()?->investmentPlan->name ?? '') == $plan->name ? 'selected' : ''
                             }}>
                             {{ $plan->name }}
                         </option>
@@ -139,5 +139,33 @@
                 Customer Details</button>
         </div>
     </form>
+
+    @php
+        $graceRequests = $customer->userSchemes->first()?->payments()->where('grace_extension_status', 'pending')->get() ?? collect();
+    @endphp
+    
+    @if($graceRequests->count() > 0)
+    <div style="margin-top: 3rem; padding: 2rem; border: 1px solid #f9a825; border-radius: 20px; background: #fff8e1;">
+        <h4 style="margin-bottom: 2rem; color: #f9a825;"><i class="fas fa-clock"></i> Pending Grace Extension Requests</h4>
+        @foreach($graceRequests as $req)
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+            <p><strong>Due Date:</strong> {{ $req->due_date->format('d M Y') }}</p>
+            <p><strong>Current Grace End:</strong> {{ $req->grace_end_date->format('d M Y') }}</p>
+            <p><strong>Reason:</strong> {{ $req->grace_extension_reason }}</p>
+            
+            <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                <form action="{{ route('admin.payments.approve_grace', $req->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-premium" style="background: #2e7d32; padding: 0.8rem 1.5rem; cursor: pointer;">Approve & Extend 15 Days</button>
+                </form>
+                <form action="{{ route('admin.payments.reject_grace', $req->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-premium" style="background: #c62828; padding: 0.8rem 1.5rem; cursor: pointer;">Reject</button>
+                </form>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
 </div>
 @endsection

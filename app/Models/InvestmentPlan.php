@@ -26,4 +26,9 @@ class InvestmentPlan extends Model
         'features' => 'array',
         'is_popular' => 'boolean',
     ];
+
+    public function userSchemes()
+    {
+        return $this->hasMany(UserScheme::class, 'scheme_id');
+    }
 }

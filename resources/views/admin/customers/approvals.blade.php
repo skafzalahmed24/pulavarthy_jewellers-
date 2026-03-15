@@ -44,10 +44,10 @@
                         </div>
                     </td>
                     <td style="padding: 1.5rem 2rem;">
-                        <div style="font-weight: 700; color: var(--accent-color);">{{ $customer->scheme_number ??
+                        <div style="font-weight: 700; color: var(--accent-color);">{{ $customer->userSchemes->first()?->scheme_number ??
                             'Pending Approval' }}
                         </div>
-                        <div style="font-size: 0.85rem; color: #888;">{{ $customer->plan_category ?? 'N/A' }}</div>
+                        <div style="font-size: 0.85rem; color: #888;">{{ $customer->userSchemes->first()?->investmentPlan->name ?? 'N/A' }}</div>
                     </td>
                     <td style="padding: 1.5rem 2rem;">
                         <span

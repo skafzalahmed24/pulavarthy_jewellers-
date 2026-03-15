@@ -33,7 +33,6 @@ class User extends Authenticatable
         'nominee_relationship',
         'nominee_contact',
         'status',
-        'scheme_number',
     ];
 
     /**
@@ -55,4 +54,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function userSchemes()
+    {
+        return $this->hasMany(UserScheme::class);
+    }
 }

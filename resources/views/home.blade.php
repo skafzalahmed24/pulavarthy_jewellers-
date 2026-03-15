@@ -3,26 +3,61 @@
 @section('title', 'Secure Your Golden Future')
 
 @section('content')
-<!-- Hero Section -->
-<section class="hero-slider"
-    style="background: url('{{ asset('img/freepik__gold-jewellery-with-baby-pink__80995.png') }}') no-repeat center center; background-size: cover;">
-    <div class="hero-overlay"></div>
-    <div class="centered-hero-content">
-        <h1 class="fadeInUp">Secure Your Golden Future Today</h1>
-        <p class="fadeInUp" style="animation-delay: 0.2s;">Join our trusted Jewellery Purchase Plan and save monthly
-            with confidence. Timeless value for your precious milestones.</p>
-        <div class="btn-group fadeInUp" style="animation-delay: 0.4s;">
-            <a href="{{ url('/purchase-plan') }}" class="btn-premium floating-btn">Explore Plan</a>
-            <a href="{{ url('/purchase-plan#join-new') }}" class="btn-outline-gold floating-btn">Join Now</a>
+<!-- Hero Slider -->
+<section class="hero-swiper swiper">
+    <div class="swiper-wrapper">
+        <!-- Slide 1 -->
+        <div class="swiper-slide">
+            <div class="slide-item" style="background-image: url('{{ asset('img/excited-young-woman-showing-engagement-ring-celebrating-getting-married-smiling-happy-talking-about-wedding-day-receive-marriage-proposal-standing-pink-background.jpg') }}');">
+                <div class="hero-overlay-premium"></div>
+                <div class="hero-content-glass">
+                    <h1 class="fadeInUp">Secure Your Golden Future Today</h1>
+                    <p class="fadeInUp" style="animation-delay: 0.2s;">Join our trusted Jewellery Purchase Plan and save monthly with confidence. Timeless value for your precious milestones.</p>
+                    <div class="btn-group fadeInUp" style="animation-delay: 0.4s;">
+                        <a href="{{ url('/purchase-plan') }}" class="btn-premium floating-btn">Explore Plan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="swiper-slide">
+            <div class="slide-item" style="background-image: url('{{ asset('img/excited-young-woman-showing-engagement-ring-getting-married-smiling-happy-talking-about-wedding-day (1).jpg') }}');">
+                <div class="hero-overlay-premium"></div>
+                <div class="hero-content-glass">
+                    <h1 class="fadeInUp">Crafted with Love & Precision</h1>
+                    <p class="fadeInUp" style="animation-delay: 0.2s;">Discover exquisite designs that tell your unique story. Modern elegance for the modern woman.</p>
+                    <div class="btn-group fadeInUp" style="animation-delay: 0.4s;">
+                        <a href="{{ url('/purchase-plan') }}" class="btn-premium floating-btn">View Plans</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="swiper-slide">
+            <div class="slide-item" style="background-image: url('{{ asset('img/excited-young-woman-showing-engagement-ring-getting-married-smiling-happy-talking-about-wedding-day.jpg') }}');">
+                <div class="hero-overlay-premium"></div>
+                <div class="hero-content-glass">
+                    <h1 class="fadeInUp">The Perfect Proposal Awaits</h1>
+                    <p class="fadeInUp" style="animation-delay: 0.2s;">Make every moment unforgettable with our signature engagement collections and flexible plans.</p>
+                    <div class="btn-group fadeInUp" style="animation-delay: 0.4s;">
+                        <a href="{{ url('/purchase-plan') }}" class="btn-premium floating-btn">Explore</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    <!-- Swiper Pagination -->
+    <div class="swiper-pagination"></div>
+    <!-- Swiper Navigation -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
 </section>
 
 <!-- Live Market Rates Section -->
-<section id="rates" style="padding: 8rem 2rem; background: var(--bg-secondary);">
-    <div style="max-width: 1200px; margin: 0 auto;">
-        <div style="text-align: center; margin-bottom: 5rem;">
-            <h2 style="font-size: 3rem;">Live Market Trends</h2>
+<section id="rates" class="section-standard" style="background: var(--bg-secondary);">
+    <div class="container-standard">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 class="section-title">Live Market Trends</h2>
             <p style="color: var(--text-secondary); max-width: 600px; margin: 1.5rem auto;">Real-time updates on gold
                 and silver prices to help you make informed investment decisions.</p>
         </div>
@@ -81,10 +116,10 @@
 </section>
 
 <!-- Highlights Section -->
-<section style="padding: 8rem 2rem;">
-    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
-        <h2 style="font-size: 3.5rem; margin-bottom: 1.5rem;">Jewellery Savings Made Simple</h2>
-        <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto 5rem; font-size: 1.2rem;">Our flexible
+<section class="section-standard">
+    <div class="container-standard" style="text-align: center;">
+        <h2 class="section-title">Jewellery Savings Made Simple</h2>
+        <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto 3rem; font-size: 1.1rem;">Our flexible
             purchase plans are designed to help you acquire your favorite jewellery without financial strain.</p>
 
         <div
@@ -119,11 +154,11 @@
 </section>
 
 <!-- Terms & Conditions Section -->
-<section style="padding: 6rem 2rem; background: #fffcfb; border-top: 1px solid #f9e6f0;">
+<section class="section-standard" style="background: #fffcfb; border-top: 1px solid #f9e6f0;">
     <div style="max-width: 900px; margin: 0 auto;">
         <div
-            style="background: white; border: 2px solid var(--accent-color); padding: 4rem; border-radius: 20px; box-shadow: var(--shadow-soft);">
-            <h3 style="text-align: center; margin-bottom: 3rem; color: var(--accent-color);">Terms & Conditions</h3>
+            style="background: white; border: 2px solid var(--accent-color); padding: 3rem; border-radius: 20px; box-shadow: var(--shadow-soft);">
+            <h3 style="text-align: center; margin-bottom: 2rem; color: var(--accent-color);">Terms & Conditions</h3>
             <ul style="list-style: none; padding: 0;">
                 @foreach($terms as $term)
                 <li style="margin-bottom: 2rem; display: flex; gap: 1.5rem;">

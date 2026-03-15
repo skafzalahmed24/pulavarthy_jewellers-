@@ -3,9 +3,9 @@
 @section('title', 'Purchase Plans')
 
 @section('content')
-<div class="tabs-container">
-    <div style="text-align: center; margin-bottom: 5rem;">
-        <h1 style="font-size: 3.5rem; margin-bottom: 1rem;">Choose Your Sparkle</h1>
+<div class="tabs-container section-standard">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 class="section-title">Choose Your Sparkle</h1>
         <p style="color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Smart investment
             plans designed to make luxury accessible for everyone. Secure your gold today.</p>
     </div>
@@ -35,11 +35,34 @@
                 @auth
                 @if(auth()->user()->status == 'approved')
                 @php
-                $userPlan = $plans->where('name', auth()->user()->plan_category)->first();
+                $userScheme = auth()->user()->userSchemes->first();
+                $userPlan = $userScheme?->investmentPlan;
                 $rawBaseDeposit = $userPlan ? $userPlan->base_deposit : 0;
-                // Remove currenty symbols, commas etc to get pure numeric value
                 $baseDeposit = (float) preg_replace('/[^0-9.]/', '', $rawBaseDeposit);
+
+                $paymentsCount = $userScheme ? $userScheme->payments()->count() : 0;
+                $pendingPayment = $userScheme ? $userScheme->payments()->where('payment_status', 'pending')->orderBy('due_date', 'asc')->first() : null;
+                
+                $isCompleted = ($paymentsCount > 0 && !$pendingPayment);
+                $isFirstPayment = ($paymentsCount == 0);
+                $isGraceOver = $pendingPayment && $pendingPayment->grace_end_date && now()->isAfter($pendingPayment->grace_end_date);
+                $dueDate = $pendingPayment ? $pendingPayment->due_date->format('d-M-Y') : date('d-M-Y');
+                
+                $goldPrice = isset($prices) ? $prices->get('Gold') : null;
+                $todaysGoldRate = $goldPrice ? (float) preg_replace('/[^0-9.]/', '', $goldPrice->today_price) : 0;
                 @endphp
+                
+                @if(session('success'))
+                <div style="background: #e8f5e9; color: #2e7d32; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                </div>
+                @endif
+                @if(session('error'))
+                <div style="background: #ffebee; color: #c62828; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; font-weight: 600;">
+                    <i class="fas fa-times-circle"></i> {{ session('error') }}
+                </div>
+                @endif
+
                 <div id="payment-summary">
                     <div style="text-align: center; margin-bottom: 2.5rem;">
                         <h2 style="margin-bottom: 0.5rem;">Hi {{ explode(' ', auth()->user()->name)[0] }},</h2>
@@ -50,36 +73,56 @@
                             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                                 <span style="opacity: 0.7;">Scheme Number</span>
                                 <span style="font-weight: 700; color: var(--accent-color);">{{
-                                    auth()->user()->scheme_number }}</span>
+                                    auth()->user()->userSchemes->first()?->scheme_number ?? 'Pending Approval' }}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="opacity: 0.7;">Active Plan</span>
                                 <span style="font-weight: 700; color: var(--heading-color);">{{
-                                    auth()->user()->plan_category }}</span>
+                                    auth()->user()->userSchemes->first()?->investmentPlan->name ?? 'None' }}</span>
                             </div>
                         </div>
 
-                        <div
-                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; text-align: left;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; text-align: left;">
                             <div style="background: white; padding: 1rem; border-radius: 12px;">
-                                <label
-                                    style="display: block; font-size: 0.75rem; opacity: 0.6; margin-bottom: 0.3rem;">Due
-                                    Date</label>
-                                <span style="font-weight: 700; color: #c0392b;">{{ date('10-M-Y') }}</span>
+                                <label style="display: block; font-size: 0.75rem; opacity: 0.6; margin-bottom: 0.3rem;">Due Date</label>
+                                <span style="font-weight: 700; color: #c0392b;">{{ $dueDate }}</span>
                             </div>
                             <div style="background: white; padding: 1rem; border-radius: 12px;">
-                                <label
-                                    style="display: block; font-size: 0.75rem; opacity: 0.6; margin-bottom: 0.3rem;">Payable
-                                    Amount</label>
-                                <span style="font-weight: 700; color: var(--heading-color);">₹ {{
-                                    number_format($baseDeposit) }}</span>
+                                <label style="display: block; font-size: 0.75rem; opacity: 0.6; margin-bottom: 0.3rem;">Payable Amount</label>
+                                <span style="font-weight: 700; color: var(--heading-color);">₹ {{ number_format($baseDeposit) }}</span>
+                            </div>
+                            <div style="background: white; padding: 1rem; border-radius: 12px; grid-column: span 2;">
+                                <label style="display: block; font-size: 0.75rem; opacity: 0.6; margin-bottom: 0.3rem;">Approx. Gold Weight (Today's 24K Rate)</label>
+                                <span style="font-weight: 700; color: var(--accent-color);">
+                                    {{ $todaysGoldRate > 0 ? number_format($baseDeposit / $todaysGoldRate, 3) : 0 }} g <small style="color: #888;">(@ ₹{{ number_format($todaysGoldRate) }}/g)</small>
+                                </span>
                             </div>
                         </div>
 
-                        <button class="btn-premium" onclick="showCheckout()"
-                            style="width: 100%; padding: 1.2rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Proceed
-                            with Payment
-                        </button>
+                        @if($isCompleted)
+                            <div style="background: #e8f5e9; color: #2e7d32; padding: 1.2rem; border-radius: 12px; text-align: center; font-weight: 700;">
+                                Scheme Completed! <i class="fas fa-check-circle"></i>
+                            </div>
+                        @elseif($isGraceOver)
+                            @if($pendingPayment->grace_extension_status == 'pending')
+                                <div style="background: #fff8e1; color: #f9a825; padding: 1.2rem; border-radius: 12px; text-align: center; font-weight: 700;">
+                                    <i class="fas fa-clock"></i> Grace Extension Requested
+                                </div>
+                            @elseif($pendingPayment->grace_extension_status == 'rejected')
+                                <div style="background: #ffebee; color: #c62828; padding: 1.2rem; border-radius: 12px; text-align: center; font-weight: 700; margin-bottom: 1rem;">
+                                    <i class="fas fa-times-circle"></i> Extension Rejected. Please visit branch.
+                                </div>
+                            @else
+                                <button class="btn-premium" style="width: 100%; padding: 1.2rem; border-radius: 12px; font-weight: 700; background: #c0392b; cursor: pointer;" onclick="document.getElementById('graceModal').style.display='flex'">
+                                    <i class="fas fa-exclamation-triangle"></i> Grace Period Over - Request Extension
+                                </button>
+                            @endif
+                        @else
+                            <button class="btn-premium" onclick="showCheckout()"
+                                style="width: 100%; padding: 1.2rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Proceed
+                                with Payment
+                            </button>
+                        @endif
                     </div>
                 </div>
 
@@ -102,7 +145,8 @@
                                 <label
                                     style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; opacity: 0.7;">Payable
                                     Amount (₹)</label>
-                                <input type="number" value="{{ $baseDeposit }}" class="form-control"
+                                <input type="number" id="payable-amount" value="{{ $baseDeposit }}" class="form-control"
+                                    placeholder="Enter amount" required readonly
                                     style="background: white; border: 1px solid #ddd; padding: 1rem; font-weight: 700; color: var(--heading-color);">
                             </div>
                             <div class="form-group" style="margin: 0;">
@@ -111,7 +155,7 @@
                                     Number</label>
                                 <div
                                     style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; border-radius: 10px; font-weight: 700; color: var(--accent-color);">
-                                    {{ auth()->user()->scheme_number }}
+                                    {{ auth()->user()->userSchemes->first()?->scheme_number ?? 'Pending Approval' }}
                                 </div>
                             </div>
                             <!-- Row 2 -->
@@ -119,8 +163,8 @@
                                 <label
                                     style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; opacity: 0.7;">Weight
                                     (Approx. Gold)</label>
-                                <input type="text" placeholder="--" class="form-control"
-                                    style="background: white; border: 1px solid #ddd; padding: 1rem;">
+                                <input type="text" id="approx-weight" placeholder="e.g. 1.5g" class="form-control" readonly
+                                    style="background: #f9f9f9; border: 1px solid #ddd; padding: 1rem; font-weight: 700; color: var(--accent-color);">
                             </div>
                             <div class="form-group" style="margin: 0;">
                                 <label
@@ -128,19 +172,101 @@
                                     Gold Rate (24K)</label>
                                 <div
                                     style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; border-radius: 10px; font-weight: 700; color: #27ae60;">
-                                    ₹ {{ isset($prices['Gold (24K)']) ? number_format($prices['Gold
-                                    (24K)']->rate_per_gram) : '--' }} / g
+                                    ₹ <span id="current-gold-rate">{{ $todaysGoldRate > 0 ? number_format($todaysGoldRate) : '--' }}</span> / g
                                 </div>
                             </div>
                         </div>
 
-                        <button class="btn-premium"
+                        <button id="rzp-button1" class="btn-premium"
                             style="width: 100%; padding: 1.2rem; border-radius: 12px; font-weight: 700;">Proceed to
                             Pay</button>
                     </div>
                 </div>
 
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
                 <script>
+                    document.getElementById('rzp-button1').onclick = function(e){
+                        e.preventDefault();
+                        const btn = this;
+                        btn.disabled = true;
+                        btn.innerHTML = 'Processing...';
+
+                        fetch('{{ route("payment.create_order") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.error) {
+                                alert(data.error);
+                                btn.disabled = false;
+                                btn.innerHTML = 'Proceed to Pay';
+                                return;
+                            }
+                            var options = {
+                                "key": data.key, 
+                                "amount": data.amount * 100,
+                                "currency": "INR",
+                                "name": "PJ Chits",
+                                "description": "Investment Plan Payment",
+                                "order_id": data.order_id,
+                                "handler": function (response){
+                                    fetch('{{ route("payment.verify") }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({
+                                            razorpay_payment_id: response.razorpay_payment_id,
+                                            razorpay_order_id: response.razorpay_order_id,
+                                            razorpay_signature: response.razorpay_signature
+                                        })
+                                    })
+                                    .then(res => res.json())
+                                    .then(verifyData => {
+                                        if(verifyData.success) {
+                                            alert('Payment successful!');
+                                            location.reload();
+                                        } else {
+                                            alert(verifyData.message);
+                                        }
+                                    });
+                                },
+                                "prefill": {
+                                    "name": data.user.name,
+                                    "email": data.user.email,
+                                    "contact": data.user.mobile
+                                },
+                                "theme": {
+                                    "color": "#262261"
+                                }
+                            };
+                            var rzp1 = new Razorpay(options);
+                            rzp1.on('payment.failed', function (response){
+                                alert(response.error.description);
+                                btn.disabled = false;
+                                btn.innerHTML = 'Proceed to Pay';
+                            });
+                            rzp1.open();
+                            
+                            // fallback just in case they close it
+                            setTimeout(() => {
+                                btn.disabled = false;
+                                btn.innerHTML = 'Proceed to Pay';
+                            }, 5000);
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            btn.disabled = false;
+                            btn.innerHTML = 'Proceed to Pay';
+                            alert('Something went wrong!');
+                        });
+                    }
+                    
                     function showCheckout() {
                         document.getElementById('payment-summary').style.display = 'none';
                         document.getElementById('payment-checkout').style.display = 'block';
@@ -149,6 +275,26 @@
                         document.getElementById('payment-summary').style.display = 'block';
                         document.getElementById('payment-checkout').style.display = 'none';
                     }
+
+                    // Auto-calculate logic
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const amountInput = document.getElementById('payable-amount');
+                        const weightInput = document.getElementById('approx-weight');
+                        const rateStr = '{{ $todaysGoldRate }}'; // Numeric value injected
+                        const rate = parseFloat(rateStr);
+
+                        function recalculate() {
+                            const amt = parseFloat(amountInput.value) || 0;
+                            if (amt > 0 && rate > 0) {
+                                weightInput.value = (amt / rate).toFixed(3) + ' g';
+                            } else {
+                                weightInput.value = '-- g';
+                            }
+                        }
+
+                        recalculate();
+                        amountInput.addEventListener('input', recalculate);
+                    });
                 </script>
                 @elseif(auth()->user()->status == 'pending')
                 <div style="text-align: center; margin-bottom: 2.5rem;">
@@ -200,11 +346,11 @@
                     @csrf
                     <div class="form-group">
                         <label><i class="fas fa-mobile-alt" style="margin-right: 8px;"></i> Registered Mobile</label>
-                        <input type="tel" name="mobile" class="form-control" placeholder="98765 43210" required>
+                        <input type="tel" name="mobile" class="form-control" placeholder="Enter your mobile number" pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" required>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-lock" style="margin-right: 8px;"></i> Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
                     </div>
                     <button type="submit" class="btn-premium"
                         style="width: 100%; margin-top: 1rem; border-radius: 15px;">Login to Portal</button>
@@ -330,21 +476,21 @@
                             Address Details</h4>
                         <div class="form-group">
                             <label>Street & Door No.</label>
-                            <input type="text" name="address" class="form-control" placeholder="Street layout, number">
+                            <input type="text" name="address" class="form-control" placeholder="e.g. 12-34/A, Golden Street" required>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
                                 <label>City</label>
-                                <input type="text" name="city" class="form-control">
+                                <input type="text" name="city" class="form-control" placeholder="e.g. Vijayawada" required>
                             </div>
                             <div class="form-group">
                                 <label>Pincode</label>
-                                <input type="text" name="pincode" class="form-control">
+                                <input type="text" name="pincode" class="form-control" placeholder="6 digits" pattern="[0-9]{6}" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>State</label>
-                            <input type="text" name="state" class="form-control">
+                            <input type="text" name="state" class="form-control" placeholder="e.g. Andhra Pradesh" required>
                         </div>
                     </div>
 
@@ -355,7 +501,7 @@
                             Plan Selection</h4>
                         <div class="form-group">
                             <label>Identity Proof (Aadhaar/PAN)</label>
-                            <input type="text" name="identity_proof" class="form-control" placeholder="Enter ID number">
+                            <input type="text" name="identity_proof" class="form-control" placeholder="Enter Aadhaar or PAN number" required>
                         </div>
                         <div class="form-group">
                             <label>Select Plan Category</label>
@@ -375,15 +521,15 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
                         <div class="form-group">
                             <label>Nominee Name</label>
-                            <input type="text" name="nominee_name" class="form-control">
+                            <input type="text" name="nominee_name" class="form-control" placeholder="Enter nominee's full name" required>
                         </div>
                         <div class="form-group">
                             <label>Relationship</label>
-                            <input type="text" name="nominee_relationship" class="form-control">
+                            <input type="text" name="nominee_relationship" class="form-control" placeholder="e.g. Spouse, Parent" required>
                         </div>
                         <div class="form-group">
                             <label>Nominee Contact</label>
-                            <input type="tel" name="nominee_contact" class="form-control">
+                            <input type="tel" name="nominee_contact" class="form-control" placeholder="10-digit number" pattern="[0-9]{10}" required>
                         </div>
                     </div>
                 </div>
@@ -439,12 +585,12 @@
                         <h4 style="margin-bottom: 1.5rem; color: var(--heading-color);">Plan Information</h4>
                         <div style="margin-bottom: 1rem;">
                             <label style="display: block; font-size: 0.8rem; opacity: 0.6;">Scheme Number</label>
-                            <span style="font-weight: 700; color: var(--accent-color);">{{ auth()->user()->scheme_number
+                            <span style="font-weight: 700; color: var(--accent-color);">{{ auth()->user()->userSchemes->first()?->scheme_number
                                 ?? 'Pending Approval' }}</span>
                         </div>
                         <div style="margin-bottom: 1rem;">
                             <label style="display: block; font-size: 0.8rem; opacity: 0.6;">Active Plan</label>
-                            <span style="font-weight: 600; color: var(--accent-color);">{{ auth()->user()->plan_category
+                            <span style="font-weight: 600; color: var(--accent-color);">{{ auth()->user()->userSchemes->first()?->investmentPlan->name ?? 'None'
                                 }}</span>
                         </div>
                         <div style="margin-bottom: 1rem;">
@@ -500,6 +646,27 @@
     @endguest
 </div>
 
+<!-- Grace Period Modal -->
+@if(isset($isGraceOver) && $isGraceOver && $pendingPayment)
+<div id="graceModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 20px; padding: 2.5rem; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0; font-weight: 700; color: var(--heading-color);">Request Grace Extension</h3>
+            <button onclick="document.getElementById('graceModal').style.display='none'" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888;">&times;</button>
+        </div>
+        <form action="{{ route('customer.request_grace') }}" method="POST">
+            @csrf
+            <input type="hidden" name="payment_id" value="{{ $pendingPayment->id }}">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Reason for Delay</label>
+                <textarea name="reason" rows="4" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid #ddd; resize: vertical; font-family: inherit;" required placeholder="Please explain why you need an extension..."></textarea>
+            </div>
+            <button type="submit" class="btn-premium" style="width: 100%; padding: 1.2rem; border-radius: 12px; font-weight: 700;">Submit Request</button>
+        </form>
+    </div>
+</div>
+@endif
+
 <script>
     function openJoinTab() {
         const joinTabBtn = document.querySelector('[data-tab="join-new"]');
@@ -512,21 +679,26 @@
 
     function openJoinWithPlan(planName) {
         openJoinTab();
-        const selent.getElementById('plan_category_select');
+        const select = document.getElementById('plan_category_select');
         if (select) {
-            se = planNam  document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tabs = document.querySelectorAll('.tab-content');
-                    const targetId = btn.dataset.tab;
-                    const targetTab = document.getElementById(targetId);
+            select.value = planName;
+        }
+    }
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabs = document.querySelectorAll('.tab-content');
+            const targetId = btn.dataset.tab;
+            const targetTab = document.getElementById(targetId);
 
-                    if (!targetTab) return;
+            if (!targetTab) return;
 
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    tabs.forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            tabs.forEach(c => c.classList.remove('active'));
 
-                    btn.classList.add('active');
-                    targetTab.classList.add('active');
-      );
+            btn.classList.add('active');
+            targetTab.classList.add('active');
+        });
+    });
 </script>
 @endsection

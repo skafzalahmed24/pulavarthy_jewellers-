@@ -29,6 +29,12 @@ Route::post('/register', [App\Http\Controllers\RegistrationController::class , '
 Route::post('/login', [App\Http\Controllers\Auth\LoginController::class , 'login'])->name('customer.login');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class , 'logout'])->name('customer.logout');
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/customer/payment/create-order', [App\Http\Controllers\PaymentController::class, 'createOrder'])->name('payment.create_order');
+    Route::post('/customer/payment/verify', [App\Http\Controllers\PaymentController::class, 'verifyPayment'])->name('payment.verify');
+    Route::post('/customer/request-grace', [App\Http\Controllers\PaymentController::class, 'requestGrace'])->name('customer.request_grace');
+});
+
 // Admin Routes
 Route::prefix('admin')->group(function () {
     Route::get('/', [App\Http\Controllers\AdminController::class , 'showLoginForm'])->name('admin.login');
@@ -57,6 +63,9 @@ Route::prefix('admin')->group(function () {
                 );
 
                 Route::get('/approvals', [App\Http\Controllers\CustomerController::class , 'approvals'])->name('admin.approvals');
+                
+                Route::post('/payments/{id}/approve-grace', [App\Http\Controllers\AdminController::class, 'approveGrace'])->name('admin.payments.approve_grace');
+                Route::post('/payments/{id}/reject-grace', [App\Http\Controllers\AdminController::class, 'rejectGrace'])->name('admin.payments.reject_grace');
 
                 // Customer Management
                 Route::resource('customers', App\Http\Controllers\CustomerController::class)->names([
