@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{{ asset('css/luxury-style.css') }}">
     <style>
         :root {
-            --sidebar-width: 280px;
+            --sidebar-width: 240px;
         }
 
         body {
@@ -31,22 +31,17 @@
             background: #0a0a1a;
             color: white;
             position: fixed;
-            height: 100vh;
+            height: calc(100vh - var(--header-height));
             left: 0;
-            top: 0;
+            top: var(--header-height);
             z-index: 100;
-            padding: 2rem 0;
+            padding: 1rem 0;
             box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
         }
 
         .sidebar-header {
-            padding: 0 2rem 3rem;
-            text-align: center;
-        }
-
-        .sidebar-header img {
-            width: 150px;
-            filter: brightness(0) invert(1);
+            display: none;
         }
 
         .nav-links {
@@ -55,7 +50,7 @@
         }
 
         .nav-item {
-            padding: 0.5rem 2rem;
+            padding: 0.3rem 1.2rem;
         }
 
         .nav-link {
@@ -63,10 +58,11 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
             font-weight: 500;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
 
@@ -86,31 +82,50 @@
             margin-left: var(--sidebar-width);
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.4s ease;
         }
 
         .top-header {
             background: white;
-            height: 80px;
-            padding: 0 3rem;
+            height: var(--header-height);
+            padding: 0 2rem;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             box-shadow: var(--shadow-soft);
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 90;
+            left: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .header-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .header-logo-section img {
+            height: 45px;
+            width: auto;
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 73px;
+            gap: 1.5rem;
             cursor: pointer;
         }
 
         .content-area {
-            padding: 3rem;
+            padding: 2rem;
             flex: 1;
+            width: 100%;
+            overflow-x: hidden;
+            margin-top: var(--header-height);
         }
 
         .logout-btn {
@@ -132,7 +147,7 @@
 
         @media (max-width: 992px) {
             .sidebar {
-                width: 80px;
+                width: var(--sidebar-collapsed-width);
                 transform: translateX(0);
                 transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 padding: 1rem 0;
@@ -190,7 +205,8 @@
             }
 
             .main-wrapper {
-                margin-left: 80px;
+                margin-left: var(--sidebar-collapsed-width);
+                width: calc(100% - var(--sidebar-collapsed-width));
             }
 
             /* Expanded State for Mobile */
@@ -228,10 +244,10 @@
             }
 
             .top-header {
-                padding: 0 1.5rem;
-                justify-content: space-between;
-                left: 80px;
-                width: calc(100% - 80px);
+                padding: 0 1rem;
+                width: 100%;
+                left: 0;
+                height: var(--header-height);
             }
 
             .mobile-nav-logo {
@@ -351,15 +367,6 @@
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="mobile-toggle" id="mobileToggle">
-                <i class="fas fa-bars"></i>
-            </div>
-            <a href="{{ url('/') }}" class="sidebar-logo-desktop">
-                <img src="{{ asset('img/logo.webp') }}" alt="XYZ JEWELLERS"
-                    style="width: 150px; filter: brightness(0) invert(1);">
-            </a>
-        </div>
         <ul class="nav-links">
 
             <li class="nav-item">
@@ -391,6 +398,20 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="{{ route('admin.payments.grace_requests') }}"
+                    class="nav-link {{ request()->routeIs('admin.payments.grace_requests') ? 'active' : '' }}"
+                    style="position: relative;">
+                    <i class="fas fa-clock"></i>
+                    <span>Grace Requests</span>
+                    @if(isset($pending_grace_count) && $pending_grace_count > 0)
+                    <span class="badge"
+                        style="position: absolute; right: 1.5rem; background: #ff4d4d; color: white; padding: 0.1rem 0.5rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; box-shadow: 0 2px 10px rgba(255, 77, 77, 0.4);">
+                        {{ $pending_grace_count }}
+                    </span>
+                    @endif
+                </a>
+            </li>
 
             <li class="nav-item" style="margin-top: 1.5rem;">
                 <span
@@ -426,11 +447,16 @@
 
     <div class="main-wrapper">
         <header class="top-header">
-            <a href="{{ url('/') }}" class="mobile-nav-logo">
-                <img src="{{ asset('img/logo.webp') }}" alt="XYZ JEWELLERS" style="height: 100%;">
-            </a>
+            <div class="header-logo-section">
+                <div class="mobile-toggle" id="mobileToggle" style="display: flex;">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <a href="{{ url('/') }}">
+                    <img src="{{ asset('img/logo.webp') }}" alt="XYZ JEWELLERS">
+                </a>
+            </div>
             <div class="user-profile">
-                <span style="font-weight: 600;">{{ auth()->user()->name }}</span>
+                <!-- <span style="font-weight: 600;">{{ auth()->user()->name }}</span> -->
                 <form action="{{ route('admin.logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="logout-btn">

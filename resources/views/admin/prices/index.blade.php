@@ -3,8 +3,8 @@
 @section('title', 'Update Market Prices')
 
 @section('content')
-<div class="dashboard-header" style="margin-bottom: 3rem;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Update Market Prices</h1>
+<div class="dashboard-header">
+    <h1>Update Market Prices</h1>
     <p style="color: var(--text-secondary);">Manage your store's live market prices for Gold and Silver.</p>
 </div>
 
@@ -22,43 +22,39 @@
 
     <form action="{{ route('admin.prices.update') }}" method="POST">
         @csrf
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
+        <div class="grid-container grid-2">
             <!-- Gold Section -->
-            <div style="padding: 2rem; border: 1px solid #eee; border-radius: 20px;">
+            <div style="padding: 1.5rem 2rem; border: 1px solid #eee; border-radius: 20px;">
                 <h4 style="margin-bottom: 1.5rem; color: var(--accent-color);"><i class="fas fa-coins"></i> 22K Gold
                     Price</h4>
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Today's Price (Per
+                <div class="form-group">
+                    <label>Today's Price (Per
                         Gram)</label>
                     <input type="number" step="0.01" name="gold_today" class="form-control"
-                        value="{{ $prices['Gold']->today_price ?? '' }}" required
-                        style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+                        value="{{ $prices['Gold']->today_price ?? '' }}" required>
                 </div>
                 <div class="form-group">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Yesterday's Price (Per
+                    <label>Yesterday's Price (Per
                         Gram)</label>
                     <input type="number" step="0.01" name="gold_yesterday" class="form-control"
-                        value="{{ $prices['Gold']->yesterday_price ?? '' }}" required
-                        style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+                        value="{{ $prices['Gold']->yesterday_price ?? '' }}" required>
                 </div>
             </div>
 
             <!-- Silver Section -->
-            <div style="padding: 2rem; border: 1px solid #eee; border-radius: 20px;">
+            <div style="padding: 1.5rem 2rem; border: 1px solid #eee; border-radius: 20px;">
                 <h4 style="margin-bottom: 1.5rem; color: #666;"><i class="fas fa-layer-group"></i> Silver Price</h4>
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Today's Price (Per
+                <div class="form-group">
+                    <label>Today's Price (Per
                         Gram)</label>
                     <input type="number" step="0.01" name="silver_today" class="form-control"
-                        value="{{ $prices['Silver']->today_price ?? '' }}" required
-                        style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+                        value="{{ $prices['Silver']->today_price ?? '' }}" required>
                 </div>
                 <div class="form-group">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Yesterday's Price (Per
+                    <label>Yesterday's Price (Per
                         Gram)</label>
                     <input type="number" step="0.01" name="silver_yesterday" class="form-control"
-                        value="{{ $prices['Silver']->yesterday_price ?? '' }}" required
-                        style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+                        value="{{ $prices['Silver']->yesterday_price ?? '' }}" required>
                 </div>
             </div>
         </div>

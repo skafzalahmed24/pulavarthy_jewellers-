@@ -75,4 +75,50 @@ class AdminAnalyticsController extends Controller
 
         return response()->json($data);
     }
+
+    public function getPaymentData(Request $request)
+    {
+        $filter = $request->query('filter', 'monthly');
+        $query = \App\Models\Payment::where('payment_status', 'paid');
+
+        switch ($filter) {
+            case 'daily':
+                $data = $query->select(
+                    DB::raw('DATE(created_at) as date'),
+                    DB::raw('SUM(payable_amount) as total_amount')
+                )
+                    ->where('created_at', '>=', Carbon::now()->subDays(30))
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get();
+                break;
+
+            case 'weekly':
+                $data = $query->select(
+                    DB::raw('YEARWEEK(created_at) as week'),
+                    DB::raw('MIN(DATE(created_at)) as date'),
+                    DB::raw('SUM(payable_amount) as total_amount')
+                )
+                    ->where('created_at', '>=', Carbon::now()->subWeeks(12))
+                    ->groupBy('week')
+                    ->orderBy('week')
+                    ->get();
+                break;
+
+            case 'monthly':
+            default:
+                $data = $query->select(
+                    DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+                    DB::raw('MIN(DATE(created_at)) as date'),
+                    DB::raw('SUM(payable_amount) as total_amount')
+                )
+                    ->where('created_at', '>=', Carbon::now()->subMonths(12))
+                    ->groupBy('month')
+                    ->orderBy('month')
+                    ->get();
+                break;
+        }
+
+        return response()->json($data);
+    }
 }

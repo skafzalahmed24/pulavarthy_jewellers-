@@ -3,10 +3,9 @@
 @section('title', 'Investment Plans')
 
 @section('content')
-<div class="dashboard-header"
-    style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+<div class="dashboard-header">
     <div>
-        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Investment Plans</h1>
+        <h1>Investment Plans</h1>
         <p style="color: var(--text-secondary);">Manage the plans displayed in the "EXPLORE PLANS" section.</p>
     </div>
     <a href="{{ route('admin.plans.create') }}" class="btn-premium" style="text-decoration: none;">
@@ -22,7 +21,7 @@
 @endif
 
 <div class="luxury-card" style="padding: 0; overflow: hidden;">
-    <div style="overflow-x: auto;">
+    <div class="table-responsive" style="padding: 1rem;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="background: var(--bg-secondary); border-bottom: 1px solid #eee;">
@@ -66,15 +65,14 @@
                     <td style="padding: 1.5rem 2rem; text-align: right;">
                         <div style="display: flex; gap: 10px; justify-content: flex-end;">
                             <a href="{{ route('admin.plans.edit', $plan->id) }}"
-                                style="color: #262261; background: #eee; padding: 10px; border-radius: 8px;">
+                                class="btn-action btn-edit" title="Edit Plan">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.plans.destroy', $plan->id) }}" method="POST"
-                                onsubmit="return confirm('Delete this plan?');">
+                                onsubmit="return confirm('Delete this plan?');" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"
-                                    style="color: #c0392b; background: #fee; border: none; padding: 10px; border-radius: 8px; cursor: pointer;">
+                                <button type="submit" class="btn-action btn-delete" title="Delete Plan">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

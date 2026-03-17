@@ -3,11 +3,10 @@
 @section('title', 'Pending Approvals')
 
 @section('content')
-<div class="dashboard-header"
-    style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+<div class="dashboard-header">
     <div>
-        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Pending Approvals</h1>
-        <p style="color: var(--text-secondary);">Manage and approve new customer registrations.</p>
+        <h1>Grace Period Requests</h1>
+        <p style="color: var(--text-secondary);">Review and approve payment deadline extensions requested by customers.</p>
     </div>
 </div>
 
@@ -19,7 +18,7 @@
 @endif
 
 <div class="luxury-card" style="padding: 0; overflow: hidden;">
-    <div style="overflow-x: auto;">
+    <div class="table-responsive" style="padding: 1rem;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="background: var(--bg-secondary); border-bottom: 1px solid #eee;">
@@ -59,16 +58,16 @@
                     <td style="padding: 1.5rem 2rem; text-align: right;">
                         <div style="display: flex; gap: 10px; justify-content: flex-end;">
                             <a href="{{ route('admin.customers.edit', $customer->id) }}"
-                                style="color: #262261; background: #eee; padding: 10px; border-radius: 8px; transition: 0.3s;"
+                                class="btn-action btn-edit"
                                 title="Edit & Approve">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.customers.destroy', $customer->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure you want to delete this pending approval?');">
+                                onsubmit="return confirm('Are you sure you want to delete this pending approval?');" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
-                                    style="color: #c0392b; background: #fee; border: none; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s;"
+                                    class="btn-action btn-delete"
                                     title="Reject & Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>

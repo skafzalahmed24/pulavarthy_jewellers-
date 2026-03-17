@@ -62,22 +62,21 @@
                 and silver prices to help you make informed investment decisions.</p>
         </div>
 
-        <div class="rates-grid"
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 4rem;">
+        <div class="rates-grid">
             <!-- Gold Card -->
             <div class="luxury-card rate-card-prominent"
-                style="border: 2px solid var(--accent-color); background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); transform: translateZ(0); transition: transform 0.4s ease;">
+                style="border: 2px solid var(--accent-color); background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
                 <h4
                     style="text-transform: uppercase; color: var(--accent-color); letter-spacing: 2px; margin-bottom: 1rem;">
                     22K Gold Price</h4>
-                <div class="price" style="font-size: 4rem; font-weight: 900; color: var(--heading-color);">
+                <div class="price" style="font-weight: 900; color: var(--heading-color);">
                     ₹ {{ number_format($prices['Gold']->today_price ?? 0, 2) }}
                     @if(isset($prices['Gold']))
                     @if($prices['Gold']->today_price > $prices['Gold']->yesterday_price)
-                    <i class="fas fa-caret-up" style="color: #27ae60; font-size: 2rem; vertical-align: middle;"></i>
+                    <i class="fas fa-caret-up" style="color: #27ae60; vertical-align: middle;"></i>
                     @elseif($prices['Gold']->today_price < $prices['Gold']->yesterday_price)
                         <i class="fas fa-caret-down"
-                            style="color: #c0392b; font-size: 2rem; vertical-align: middle;"></i>
+                            style="color: #c0392b; vertical-align: middle;"></i>
                         @endif
                         @endif
                 </div>
@@ -90,17 +89,17 @@
 
             <!-- Silver Card -->
             <div class="luxury-card rate-card-prominent"
-                style="border: 2px solid #333; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); transform: translateZ(0); transition: transform 0.4s ease;">
+                style="border: 2px solid #333; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
                 <h4 style="text-transform: uppercase; color: #666; letter-spacing: 2px; margin-bottom: 1rem;">Silver
                     Price</h4>
-                <div class="price" style="font-size: 4rem; font-weight: 900; color: var(--heading-color);">
+                <div class="price" style="font-weight: 900; color: var(--heading-color);">
                     ₹ {{ number_format($prices['Silver']->today_price ?? 0, 2) }}
                     @if(isset($prices['Silver']))
                     @if($prices['Silver']->today_price > $prices['Silver']->yesterday_price)
-                    <i class="fas fa-caret-up" style="color: #27ae60; font-size: 2rem; vertical-align: middle;"></i>
+                    <i class="fas fa-caret-up" style="color: #27ae60; vertical-align: middle;"></i>
                     @elseif($prices['Silver']->today_price < $prices['Silver']->yesterday_price)
                         <i class="fas fa-caret-down"
-                            style="color: #c0392b; font-size: 2rem; vertical-align: middle;"></i>
+                            style="color: #c0392b; vertical-align: middle;"></i>
                         @endif
                         @endif
                 </div>
@@ -122,23 +121,22 @@
         <p style="color: var(--text-secondary); max-width: 700px; margin: 0 auto 3rem; font-size: 1.1rem;">Our flexible
             purchase plans are designed to help you acquire your favorite jewellery without financial strain.</p>
 
-        <div
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-bottom: 5rem;">
-            <div class="luxury-card" style="padding: 4rem 3rem;">
+        <div class="grid-container grid-3" style="margin-bottom: 5rem;">
+            <div class="luxury-card" style="padding: 3rem 2rem;">
                 <div style="font-size: 3rem; color: var(--accent-color); margin-bottom: 2rem;"><i
                         class="fas fa-shield-alt"></i></div>
                 <h4 style="margin-bottom: 1.5rem;">Secure Investment</h4>
                 <p style="color: var(--text-secondary);">Your gold is backed by our decades of trust and transparent
                     market-linked valuation.</p>
             </div>
-            <div class="luxury-card" style="padding: 4rem 3rem;">
+            <div class="luxury-card" style="padding: 3rem 2rem;">
                 <div style="font-size: 3rem; color: var(--accent-color); margin-bottom: 2rem;"><i
                         class="fas fa-calendar-alt"></i></div>
                 <h4 style="margin-bottom: 1.5rem;">Flexible Monthly Payments</h4>
                 <p style="color: var(--text-secondary);">Choose an installment amount that suits your budget and pay
                     with ease through our portal.</p>
             </div>
-            <div class="luxury-card" style="padding: 4rem 3rem;">
+            <div class="luxury-card" style="padding: 3rem 2rem;">
                 <div style="font-size: 3rem; color: var(--accent-color); margin-bottom: 2rem;"><i
                         class="fas fa-gift"></i></div>
                 <h4 style="margin-bottom: 1.5rem;">Bonus Benefits</h4>

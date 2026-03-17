@@ -64,10 +64,14 @@ Route::prefix('admin')->group(function () {
 
                 Route::get('/approvals', [App\Http\Controllers\CustomerController::class , 'approvals'])->name('admin.approvals');
                 
+                Route::get('/payments/grace-requests', [App\Http\Controllers\AdminController::class, 'graceRequests'])->name('admin.payments.grace_requests');
                 Route::post('/payments/{id}/approve-grace', [App\Http\Controllers\AdminController::class, 'approveGrace'])->name('admin.payments.approve_grace');
                 Route::post('/payments/{id}/reject-grace', [App\Http\Controllers\AdminController::class, 'rejectGrace'])->name('admin.payments.reject_grace');
 
                 // Customer Management
+                Route::get('/customers/{id}/payments', [App\Http\Controllers\CustomerController::class, 'paymentTerms'])->name('admin.customers.payment_terms');
+                Route::post('/payments/{id}/update', [App\Http\Controllers\CustomerController::class, 'updatePayment'])->name('admin.payments.update');
+                
                 Route::resource('customers', App\Http\Controllers\CustomerController::class)->names([
                     'index' => 'admin.customers.index',
                     'create' => 'admin.customers.create',
@@ -79,6 +83,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::get('/analytics/status', [App\Http\Controllers\Admin\AdminAnalyticsController::class , 'getStatusData'])->name('admin.analytics.status');
                 Route::get('/analytics/growth', [App\Http\Controllers\Admin\AdminAnalyticsController::class , 'getGrowthData'])->name('admin.analytics.growth');
+                Route::get('/analytics/payment', [App\Http\Controllers\Admin\AdminAnalyticsController::class , 'getPaymentData'])->name('admin.analytics.payment');
 
                 Route::post('/logout', [App\Http\Controllers\AdminController::class , 'logout'])->name('admin.logout');
             }

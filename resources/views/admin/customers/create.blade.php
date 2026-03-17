@@ -13,7 +13,7 @@
         @csrf
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
             <!-- Personal Info -->
-            <div style="padding: 2rem; border: 1px solid #eee; border-radius: 20px;">
+            <div style="padding: 1.5rem 2rem; border: 1px solid #eee; border-radius: 20px;">
                 <h4 style="margin-bottom: 2rem; color: var(--accent-color);"><i class="fas fa-user"></i> Personal
                     Information</h4>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -39,7 +39,7 @@
             </div>
 
             <!-- Address & ID -->
-            <div style="padding: 2rem; border: 1px solid #eee; border-radius: 20px;">
+            <div style="padding: 1.5rem 2rem; border: 1px solid #eee; border-radius: 20px;">
                 <h4 style="margin-bottom: 2rem; color: var(--accent-color);"><i class="fas fa-map-marker-alt"></i>
                     Address & Identity</h4>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
@@ -73,7 +73,7 @@
             </div>
 
             <!-- Plan & Nominee -->
-            <div style="padding: 2rem; border: 1px solid #eee; border-radius: 20px;">
+            <div style="padding: 1.5rem 2rem; border: 1px solid #eee; border-radius: 20px;">
                 <h4 style="margin-bottom: 2rem; color: var(--accent-color);"><i class="fas fa-gem"></i> Plan & Nominee
                 </h4>
                 <div class="form-group" style="margin-bottom: 1.5rem;">

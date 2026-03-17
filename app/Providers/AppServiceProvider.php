@@ -21,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->composer('layouts.admin', function ($view) {
             $view->with('pending_approvals_count', \App\Models\User::where('is_admin', false)->where('status', 'pending')->count());
+            $view->with('pending_grace_count', \App\Models\Payment::where('grace_extension_status', 'pending')->count());
         });
     }
 }

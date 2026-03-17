@@ -109,6 +109,16 @@ class AdminController extends Controller
         return back()->with('success', 'Grace period extension rejected.');
     }
 
+    public function graceRequests()
+    {
+        $requests = \App\Models\Payment::with('userScheme.user')
+                                        ->where('grace_extension_status', 'pending')
+                                        ->orderBy('created_at', 'asc')
+                                        ->get();
+
+        return view('admin.grace_requests', compact('requests'));
+    }
+
     public function logout()
     {
         auth()->logout();

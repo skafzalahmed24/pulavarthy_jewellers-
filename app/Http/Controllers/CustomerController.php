@@ -187,4 +187,39 @@ class CustomerController extends Controller
 
         return redirect()->route('admin.customers.index')->with('success', 'Customer has been marked as rejected.');
     }
+
+    /**
+     * View Payment Terms for a Customer
+     */
+    public function paymentTerms($id)
+    {
+        $customer = User::findOrFail($id);
+        
+        // Ensure user has a scheme before trying to get payments
+        $scheme = $customer->userSchemes()->first();
+        $payments = $scheme ? $scheme->payments()->orderBy('due_date', 'asc')->get() : collect([]);
+
+        return view('admin.customers.payments', compact('customer', 'payments'));
+    }
+
+    /**
+     * Update a specific payment
+     */
+    public function updatePayment(Request $request, $paymentId)
+    {
+        $request->validate([
+            'payment_status' => 'required|string',
+            'due_date' => 'required|date',
+            'payable_amount' => 'required|numeric'
+        ]);
+
+        $payment = \App\Models\Payment::findOrFail($paymentId);
+        $payment->update([
+            'payment_status' => $request->payment_status,
+            'due_date' => $request->due_date,
+            'payable_amount' => $request->payable_amount
+        ]);
+
+        return back()->with('success', 'Payment details updated successfully.');
+    }
 }

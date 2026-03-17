@@ -3,16 +3,16 @@
 @section('title', 'Customer Management')
 
 @section('content')
-<div class="dashboard-header"
-    style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+<div class="dashboard-header">
     <div>
-        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Customers</h1>
+        <h1>Customers</h1>
         <p style="color: var(--text-secondary);">Manage your registered jewellery plan members.</p>
     </div>
     <a href="{{ route('admin.customers.create') }}" class="btn-premium" style="text-decoration: none;">
         <i class="fas fa-plus"></i> Add New Customer
     </a>
 </div>
+
 
 @if(session('success'))
 <div class="luxury-card alert-auto-dismiss"
@@ -22,7 +22,7 @@
 @endif
 
 <div class="luxury-card" style="padding: 0; overflow: hidden;">
-    <div style="overflow-x: auto;">
+    <div class="table-responsive" style="padding: 1rem;">
         <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
                 <tr style="background: var(--bg-secondary); border-bottom: 1px solid #eee;">
@@ -36,7 +36,11 @@
             </thead>
             <tbody>
                 @forelse($customers as $customer)
-                <tr style="border-bottom: 1px solid #eee; transition: background 0.3s ease;">
+                @php
+                    $latestPayment = $customer->userSchemes->first()?->payments()->orderBy('due_date', 'desc')->first();
+                    $isOutdated = $latestPayment && $latestPayment->payment_status !== 'paid' && now()->gt($latestPayment->grace_end_date ?? $latestPayment->due_date);
+                @endphp
+                <tr class="{{ $isOutdated ? 'status-outdated' : '' }}" style="border-bottom: 1px solid #eee; transition: background 0.3s ease;">
                     <td style="padding: 1.5rem 2rem;">
                         <div style="font-weight: 700; color: var(--heading-color);">{{ $customer->name }}</div>
                         <div style="font-size: 0.85rem; color: #888;">{{ $customer->email }}</div>
@@ -63,22 +67,29 @@
                         <span
                             style="background: #fff8e1; color: #f9a825; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Pending</span>
                         @endif
+
+                        @if($isOutdated)
+                            <div class="badge-outdated" style="margin-top: 5px; display: inline-block;">OUTDATED</div>
+                        @endif
                     </td>
                     <td style="padding: 1.5rem 2rem; color: var(--text-secondary);">
                         {{ $customer->created_at->format('d M, Y') }}
                     </td>
                     <td style="padding: 1.5rem 2rem; text-align: right;">
                         <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <a href="{{ route('admin.customers.payment_terms', $customer->id) }}"
+                                class="btn-action btn-view" title="Payment Details">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </a>
                             <a href="{{ route('admin.customers.edit', $customer->id) }}"
-                                style="color: #262261; background: #eee; padding: 10px; border-radius: 8px; transition: 0.3s;">
+                                class="btn-action btn-edit" title="Edit Customer">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.customers.destroy', $customer->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure you want to delete this customer?');">
+                                onsubmit="return confirm('Are you sure you want to delete this customer?');" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"
-                                    style="color: #c0392b; background: #fee; border: none; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.3s;">
+                                <button type="submit" class="btn-action btn-delete" title="Delete Customer">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

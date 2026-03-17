@@ -24,7 +24,7 @@
         @csrf
         <div style="display: flex; flex-direction: column; gap: 2rem;">
             @foreach($terms as $index => $term)
-            <div style="padding: 2rem; border: 1px solid #eee; border-radius: 20px; background: #fffcfb;">
+            <div style=1.5rem 2rem" background: #fffcfb;">
                 <input type="hidden" name="terms[{{ $index }}][id]" value="{{ $term->id }}">
                 <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
                     <div style="font-size: 2rem; color: var(--accent-color); padding-top: 5px;">
