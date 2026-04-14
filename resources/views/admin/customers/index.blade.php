@@ -9,7 +9,7 @@
         <p style="color: var(--text-secondary);">Manage your registered jewellery plan members.</p>
     </div>
     <a href="{{ route('admin.customers.create') }}" class="btn-premium" style="text-decoration: none;">
-        <i class="fas fa-plus"></i> Add New Customer
+        <i class="fas fa-plus"></i> Add 
     </a>
 </div>
 

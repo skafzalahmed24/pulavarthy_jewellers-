@@ -37,7 +37,7 @@
                     <label>Yesterday's Price (Per
                         Gram)</label>
                     <input type="number" step="0.01" name="gold_yesterday" class="form-control"
-                        value="{{ $prices['Gold']->yesterday_price ?? '' }}" required>
+                        value="{{ $prices['Gold']->yesterday_price ?? '' }}">
                 </div>
             </div>
 
@@ -54,7 +54,7 @@
                     <label>Yesterday's Price (Per
                         Gram)</label>
                     <input type="number" step="0.01" name="silver_yesterday" class="form-control"
-                        value="{{ $prices['Silver']->yesterday_price ?? '' }}" required>
+                        value="{{ $prices['Silver']->yesterday_price ?? '' }}">
                 </div>
             </div>
         </div>

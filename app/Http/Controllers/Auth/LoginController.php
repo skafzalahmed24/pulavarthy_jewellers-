@@ -31,7 +31,11 @@ class LoginController extends Controller
         }
 
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
-            return redirect()->route('purchase-plan')->with('success', 'Logged in successfully!');
+            $user = Auth::user();
+            if ($user->is_admin) {
+                return redirect()->route('admin.dashboard')->with('success', 'Logged in successfully!');
+            }
+            return redirect()->route('customer.dashboard')->with('success', 'Logged in successfully!');
         }
 
         return back()->withErrors(['mobile' => 'Invalid mobile number or password.']);
@@ -40,6 +44,6 @@ class LoginController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('purchase-plan')->with('success', 'Logged out successfully!');
+        return redirect()->route('home')->with('success', 'Logged out successfully!');
     }
 }

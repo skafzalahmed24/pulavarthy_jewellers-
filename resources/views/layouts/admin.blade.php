@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Dashboard') | XYZ JEWELLERS</title>
+    <title>@yield('title', 'Admin Dashboard')</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -289,6 +289,30 @@
             max-width: 100%;
         }
 
+        /* Responsive Table */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            display: block; /* Ensure it behaves as a block for overflow */
+        }
+
+        .table-responsive table {
+            min-width: 900px; /* Force minimum width to enable horizontal scroll and prevent squishing */
+            white-space: nowrap; /* Text stays on a single line */
+        }
+        
+        @media (max-width: 768px) {
+            .table-responsive table {
+                min-width: 700px; /* Slightly smaller min-width for tablets to reduce excessive scrolling */
+            }
+            
+            .table-responsive th, .table-responsive td {
+                padding: 1rem !important; /* Reduce padding on smaller screens */
+            }
+        }
+
+
         /* Premium Pagination Styles */
         .pagination-container {
             display: flex;
@@ -452,7 +476,7 @@
                     <i class="fas fa-bars"></i>
                 </div>
                 <a href="{{ url('/') }}">
-                    <img src="{{ asset('img/logo.webp') }}" alt="XYZ JEWELLERS">
+                    <img src="{{ asset('img/logo.webp') }}">
                 </a>
             </div>
             <div class="user-profile">

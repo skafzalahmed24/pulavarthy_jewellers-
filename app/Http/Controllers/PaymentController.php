@@ -77,6 +77,25 @@ class PaymentController extends Controller
         $existingPaymentsCount = $userScheme->payments()->count();
 
         if ($existingPaymentsCount === 0) {
+            // Generate scheme number for the first payment
+            $plan = $userScheme->investmentPlan;
+            if (is_null($userScheme->scheme_number) && $plan && $plan->scheme_prefix) {
+                $prefix = $plan->scheme_prefix;
+                $lastScheme = \App\Models\UserScheme::where('scheme_number', 'LIKE', $prefix . '%')
+                    ->orderBy('scheme_number', 'desc')
+                    ->first();
+
+                $newNumber = 1;
+                if ($lastScheme) {
+                    $lastNumber = intval(substr($lastScheme->scheme_number, strlen($prefix)));
+                    $newNumber = $lastNumber + 1;
+                }
+
+                $userScheme->update([
+                    'scheme_number' => $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT),
+                ]);
+            }
+
             // Create the first paid payment
             \App\Models\Payment::create([
                 'user_scheme_id' => $userScheme->id,
@@ -90,9 +109,12 @@ class PaymentController extends Controller
                 'payment_status' => 'paid',
             ]);
 
-            // Generate 11 more pending months
+            // Generate pending months based on dynamic plan term
+            $totalTerms = $plan && $plan->term ? (int) preg_replace('/[^0-9]/', '', $plan->term) : 12;
+            $pendingTerms = $totalTerms > 1 ? $totalTerms - 1 : 11;
+
             $baseDueDate = now();
-            for ($i = 1; $i <= 11; $i++) {
+            for ($i = 1; $i <= $pendingTerms; $i++) {
                 $dueDate = $baseDueDate->copy()->addDays(30 * $i);
                 \App\Models\Payment::create([
                     'user_scheme_id' => $userScheme->id,
@@ -100,7 +122,7 @@ class PaymentController extends Controller
                     'current_gold_rate' => null,
                     'payable_amount' => $payableAmount,
                     'due_date' => $dueDate,
-                    'next_due_date' => $i == 11 ? null : $dueDate->copy()->addDays(30),
+                    'next_due_date' => $i == $pendingTerms ? null : $dueDate->copy()->addDays(30),
                     'grace_start_date' => $dueDate->copy()->addDays(1),
                     'grace_end_date' => $dueDate->copy()->addDays(7),
                     'payment_status' => 'pending',

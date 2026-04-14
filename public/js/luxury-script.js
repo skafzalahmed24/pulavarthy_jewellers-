@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.getAttribute('data-tab');
+                if (!target) return;
 
                 // Remove active class from all buttons and contents
                 tabBtns.forEach(b => b.classList.remove('active'));
@@ -61,7 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Add active class to clicked button and target content
                 btn.classList.add('active');
-                document.getElementById(target).classList.add('active');
+                const targetEl = document.getElementById(target);
+                if (targetEl) targetEl.classList.add('active');
             });
         });
     }

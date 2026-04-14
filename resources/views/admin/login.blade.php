@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | XYZ JEWELLERS</title>
+    <title>Admin Login</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,7 +71,7 @@
     <div class="login-container">
         <div class="login-card">
             <div class="logo-box">
-                <img src="{{ asset('img/logo.webp') }}" alt="XYZ JEWELLERS">
+                <img src="{{ asset('img/logo.webp') }}">
             </div>
             <div class="form-title">
                 <h2>Admin Panel</h2>
@@ -93,7 +93,10 @@
                 </div>
                 <div class="form-group" style="text-align: left;">
                     <label><i class="fas fa-lock" style="margin-right: 8px;"></i> Password</label>
-                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <div style="position: relative;">
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        <i class="fas fa-eye" onclick="const input = this.parentElement.querySelector('input'); if(input.type === 'password') { input.type = 'text'; this.classList.remove('fa-eye'); this.classList.add('fa-eye-slash'); } else { input.type = 'password'; this.classList.remove('fa-eye-slash'); this.classList.add('fa-eye'); }" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+                    </div>
                 </div>
                 <button type="submit" class="btn-premium"
                     style="width: 100%; margin-top: 1rem; border-radius: 15px;">Login to Dashboard</button>

@@ -78,6 +78,70 @@
     border-spacing: 0;
 }
 
+/* Table to Cards on Mobile */
+@media (max-width: 768px) {
+    .table-mobile-cards, .table-mobile-cards thead, .table-mobile-cards tbody, .table-mobile-cards th, .table-mobile-cards td, .table-mobile-cards tr {
+        display: block;
+    }
+    
+    .table-mobile-cards {
+        min-width: 100% !important;
+        background: transparent !important;
+    }
+    
+    .table-mobile-cards thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    .table-mobile-cards tr {
+        border: 1px solid #eaeaea;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        background: white;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
+    
+    .table-mobile-cards td {
+        border: none;
+        border-bottom: 1px solid #f5f5f5;
+        position: relative;
+        padding: 1rem 1rem 1rem 45% !important;
+        text-align: right !important;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+    
+    .table-mobile-cards td:before {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40%;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        content: attr(data-label);
+        white-space: nowrap;
+    }
+    
+    .table-mobile-cards td:last-child {
+        border-bottom: 0;
+        background: #fafafa;
+        justify-content: center;
+        padding-left: 1rem !important; /* Center the action button */
+    }
+    .table-mobile-cards td:last-child:before {
+        display: none; /* Hide label for final action row */
+    }
+}
+
+
 /* Outdated/Grace Period Styles */
 .status-outdated {
     border-left: 4px solid var(--accent-color);
@@ -171,6 +235,14 @@ h4 {
 
 .content-area h4 {
     font-size: 1.1rem !important;
+}
+
+/* Dashboard Layout */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
 .dashboard-header h1 {
@@ -285,7 +357,7 @@ h4 {
 }
 
 /* Cards */
-.luxury-card {
+/* .luxury-card {
     background: var(--white);
     border-radius: 20px;
     padding: 1.5rem 2rem;
@@ -298,7 +370,7 @@ h4 {
     transform: translateY(-5px);
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
     border-color: rgba(158, 31, 99, 0.1);
-}
+} */
 
 /* Navbar */
 header {
@@ -835,9 +907,9 @@ footer h4 {
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
 
-    .luxury-card {
+    /* .luxury-card {
         padding: 2rem;
-    }
+    } */
     .badge-outdated {
         background: var(--accent-color);
         color: white;

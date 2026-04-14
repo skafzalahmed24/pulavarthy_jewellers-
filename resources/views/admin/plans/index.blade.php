@@ -9,7 +9,7 @@
         <p style="color: var(--text-secondary);">Manage the plans displayed in the "EXPLORE PLANS" section.</p>
     </div>
     <a href="{{ route('admin.plans.create') }}" class="btn-premium" style="text-decoration: none;">
-        <i class="fas fa-plus"></i> Create New Plan
+        <i class="fas fa-plus"></i> Add
     </a>
 </div>
 

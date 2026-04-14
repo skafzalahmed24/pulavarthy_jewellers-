@@ -30,6 +30,9 @@ Route::post('/login', [App\Http\Controllers\Auth\LoginController::class , 'login
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class , 'logout'])->name('customer.logout');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/customer/dashboard', [App\Http\Controllers\CustomerDashboardController::class, 'index'])->name('customer.dashboard');
+    Route::get('/customer/schemes/{id}', [App\Http\Controllers\CustomerDashboardController::class, 'show'])->name('customer.scheme_details');
+
     Route::post('/customer/payment/create-order', [App\Http\Controllers\PaymentController::class, 'createOrder'])->name('payment.create_order');
     Route::post('/customer/payment/verify', [App\Http\Controllers\PaymentController::class, 'verifyPayment'])->name('payment.verify');
     Route::post('/customer/request-grace', [App\Http\Controllers\PaymentController::class, 'requestGrace'])->name('customer.request_grace');

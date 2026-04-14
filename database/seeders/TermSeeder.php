@@ -24,7 +24,7 @@ class TermSeeder extends Seeder
 
         \App\Models\Term::create([
             'icon' => 'fas fa-store',
-            'content' => 'Jewellery redemption is valid only at our registered store: XYZ Jewellers, MG Road, Vijayawada, Andhra Pradesh, with valid identification.'
+            'content' => 'Jewellery redemption is valid only at our registered store: Pulavarthy Jewellers, Temple St, Kakinada, Andhra Pradesh 533001, with valid identification.'
         ]);
     }
 }

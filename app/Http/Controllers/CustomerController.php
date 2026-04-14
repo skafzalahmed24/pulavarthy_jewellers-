@@ -48,20 +48,6 @@ class CustomerController extends Controller
 
         $schemeNumber = null;
         $plan = \App\Models\InvestmentPlan::where('name', $request->plan_category)->first();
-        if ($plan && $plan->scheme_prefix) {
-            $prefix = $plan->scheme_prefix;
-            $lastUserScheme = \App\Models\UserScheme::where('scheme_number', 'LIKE', $prefix . '%')
-                ->orderBy('scheme_number', 'desc')
-                ->first();
-
-            $newNumber = 1;
-            if ($lastUserScheme) {
-                $lastNumber = intval(substr($lastUserScheme->scheme_number, strlen($prefix)));
-                $newNumber = $lastNumber + 1;
-            }
-
-            $schemeNumber = $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        }
 
         $user = User::create([
             'name' => $request->name,
@@ -150,29 +136,7 @@ class CustomerController extends Controller
             }
         }
 
-        // Logic to generate scheme number on approval
-        if ($data['status'] === 'approved') {
-            $pendingScheme = $customer->userSchemes()->whereNull('scheme_number')->first();
-            if ($pendingScheme) {
-                $plan = $pendingScheme->investmentPlan;
-                if ($plan && $plan->scheme_prefix) {
-                    $prefix = $plan->scheme_prefix;
-                    $lastScheme = \App\Models\UserScheme::where('scheme_number', 'LIKE', $prefix . '%')
-                        ->orderBy('scheme_number', 'desc')
-                        ->first();
-
-                    $newNumber = 1;
-                    if ($lastScheme) {
-                        $lastNumber = intval(substr($lastScheme->scheme_number, strlen($prefix)));
-                        $newNumber = $lastNumber + 1;
-                    }
-
-                    $pendingScheme->update([
-                        'scheme_number' => $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT),
-                    ]);
-                }
-            }
-        }
+        // Scheme number generation logic is now handled after the first payment.
 
         return redirect()->route('admin.customers.index')->with('success', 'Customer updated successfully.');
     }

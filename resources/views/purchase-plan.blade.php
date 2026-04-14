@@ -19,11 +19,14 @@
 
     <div class="tabs-nav">
         <button class="tab-btn active" data-tab="pay-now">PAY NOW</button>
+        @guest
         <button class="tab-btn" data-tab="explore-plan">EXPLORE PLANS</button>
         <button class="tab-btn" data-tab="join-new">JOIN NEW PLAN</button>
+        @endguest
         @auth
         @if(!auth()->user()->is_admin)
         <button class="tab-btn" data-tab="my-plan">MY ACCOUNT</button>
+        <a href="{{ route('customer.dashboard') }}" class="tab-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">MY DASHBOARD</a>
         @endif
         @endauth
     </div>
@@ -45,8 +48,9 @@
                 
                 $isCompleted = ($paymentsCount > 0 && !$pendingPayment);
                 $isFirstPayment = ($paymentsCount == 0);
-                $isGraceOver = $pendingPayment && $pendingPayment->grace_end_date && now()->isAfter($pendingPayment->grace_end_date);
+                $isGraceOver = $pendingPayment && $pendingPayment->grace_end_date && now()->startOfDay()->greaterThan(\Carbon\Carbon::parse($pendingPayment->grace_end_date)->startOfDay());
                 $dueDate = $pendingPayment ? $pendingPayment->due_date->format('d-M-Y') : date('d-M-Y');
+                $isFuturePayment = $pendingPayment && now()->format('Y-m') < $pendingPayment->due_date->format('Y-m');
                 
                 $goldPrice = isset($prices) ? $prices->get('Gold') : null;
                 $todaysGoldRate = $goldPrice ? (float) preg_replace('/[^0-9.]/', '', $goldPrice->today_price) : 0;
@@ -102,6 +106,10 @@
                         @if($isCompleted)
                             <div style="background: #e8f5e9; color: #2e7d32; padding: 1.2rem; border-radius: 12px; text-align: center; font-weight: 700;">
                                 Scheme Completed! <i class="fas fa-check-circle"></i>
+                            </div>
+                        @elseif(isset($isFuturePayment) && $isFuturePayment)
+                            <div style="background: #e3f2fd; color: #1976d2; padding: 1.2rem; border-radius: 12px; text-align: center; font-weight: 700;">
+                                Upcoming payment is due on {{ $dueDate }}. <i class="fas fa-calendar-check"></i>
                             </div>
                         @elseif($isGraceOver)
                             @if($pendingPayment->grace_extension_status == 'pending')
@@ -173,6 +181,9 @@
                                 <div
                                     style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; border-radius: 10px; font-weight: 700; color: #27ae60;">
                                     ₹ <span id="current-gold-rate">{{ $todaysGoldRate > 0 ? number_format($todaysGoldRate) : '--' }}</span> / g
+                                </div>
+                                <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem; text-align: right;">
+                                    Updated on: {{ $goldPrice ? $goldPrice->updated_at->format('d M Y - h:i A') : '--' }}
                                 </div>
                             </div>
                         </div>
@@ -350,7 +361,10 @@
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-lock" style="margin-right: 8px;"></i> Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                        <div style="position: relative;">
+                            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                            <i class="fas fa-eye" onclick="const input = this.parentElement.querySelector('input'); if(input.type === 'password') { input.type = 'text'; this.classList.remove('fa-eye'); this.classList.add('fa-eye-slash'); } else { input.type = 'password'; this.classList.remove('fa-eye-slash'); this.classList.add('fa-eye'); }" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+                        </div>
                     </div>
                     <button type="submit" class="btn-premium"
                         style="width: 100%; margin-top: 1rem; border-radius: 15px;">Login to Portal</button>
@@ -463,8 +477,11 @@
                         </div>
                         <div class="form-group">
                             <label>Account Password</label>
-                            <input type="password" name="password" class="form-control"
-                                placeholder="Create a strong password" required>
+                            <div style="position: relative;">
+                                <input type="password" name="password" class="form-control"
+                                    placeholder="Create a strong password" required>
+                                <i class="fas fa-eye" onclick="const input = this.parentElement.querySelector('input'); if(input.type === 'password') { input.type = 'text'; this.classList.remove('fa-eye'); this.classList.add('fa-eye-slash'); } else { input.type = 'password'; this.classList.remove('fa-eye-slash'); this.classList.add('fa-eye'); }" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+                            </div>
                             <small style="font-size: 0.75rem; color: #888;">Minimum 8 characters</small>
                         </div>
                     </div>
@@ -629,8 +646,11 @@
                         <input type="tel" name="mobile" class="form-control" placeholder="Mobile Number" required>
                     </div>
                     <div class="form-group">
-                        <input type="password" name="password" class="form-control" placeholder="Account Password"
-                            required>
+                        <div style="position: relative;">
+                            <input type="password" name="password" class="form-control" placeholder="Account Password"
+                                required>
+                            <i class="fas fa-eye" onclick="const input = this.parentElement.querySelector('input'); if(input.type === 'password') { input.type = 'text'; this.classList.remove('fa-eye'); this.classList.add('fa-eye-slash'); } else { input.type = 'password'; this.classList.remove('fa-eye-slash'); this.classList.add('fa-eye'); }" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+                        </div>
                     </div>
                     <button type="submit" class="btn-premium" style="width: 100%;">Access Account</button>
                     <div style="text-align: center; margin-top: 1.5rem;">
@@ -700,5 +720,21 @@
             targetTab.classList.add('active');
         });
     });
+
+    function handleHashChange() {
+        if(window.location.hash) {
+            const hashTarget = window.location.hash.substring(1);
+            const hashBtn = document.querySelector('.tab-btn[data-tab="' + hashTarget + '"]');
+            if(hashBtn) {
+                hashBtn.click();
+            }
+        }
+    }
+
+    // Handle initial load
+    setTimeout(handleHashChange, 100);
+    
+    // Handle subsequent hash changes (e.g., clicking dropdown links on the same page)
+    window.addEventListener('hashchange', handleHashChange);
 </script>
 @endsection
