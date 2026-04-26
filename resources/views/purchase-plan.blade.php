@@ -1084,9 +1084,9 @@
                         style="width: 100%; margin-top: 1rem; border-radius: 15px;">Login to Portal</button>
                     <div
                         style="text-align: center; margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <a href="#"
+                        <!-- <a href="#"
                             style="color: var(--accent-color); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Reset
-                            Password?</a>
+                            Password?</a> -->
                         <span style="font-size: 0.85rem; color: #888;">No account? <a href="javascript:void(0)"
                                 onclick="document.querySelector('[data-tab=\'join-new\']').click()"
                                 style="color: var(--accent-color); text-decoration: none; font-weight: 700;">
