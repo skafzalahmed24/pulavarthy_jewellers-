@@ -28,6 +28,7 @@
                     <th style="padding: 1.5rem 2rem;">Due Date</th>
                     <th style="padding: 1.5rem 2rem;">Amount</th>
                     <th style="padding: 1.5rem 2rem;">Gold Rate</th>
+                    <th style="padding: 1.5rem 2rem;">Weight (g)</th>
                     <th style="padding: 1.5rem 2rem;">Status</th>
                     <th style="padding: 1.5rem 2rem; text-align: right;">Actions</th>
                 </tr>
@@ -46,6 +47,9 @@
                     </td>
                     <td style="padding: 1.5rem 2rem; color: var(--text-secondary);">
                         {{ $payment->current_gold_rate ? '₹' . number_format($payment->current_gold_rate, 2) : 'N/A' }}
+                    </td>
+                    <td style="padding: 1.5rem 2rem; font-weight: 700; color: var(--accent-color);">
+                        {{ $payment->current_gold_rate && $payment->payment_status == 'paid' ? number_format($payment->payable_amount / $payment->current_gold_rate, 3) . ' g' : 'N/A' }}
                     </td>
                     <td style="padding: 1.5rem 2rem;">
                         @if($payment->payment_status == 'paid')

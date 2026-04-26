@@ -39,9 +39,14 @@
                 @if(auth()->user()->status == 'approved')
                 @php
                 $userScheme = auth()->user()->userSchemes->first();
+                
+                if (!$userScheme) {
+                    $plans = \App\Models\InvestmentPlan::all();
+                }
+                
                 $userPlan = $userScheme?->investmentPlan;
                 $rawBaseDeposit = $userPlan ? $userPlan->base_deposit : 0;
-                $baseDeposit = (float) preg_replace('/[^0-9.]/', '', $rawBaseDeposit);
+                $baseDeposit = $userScheme?->monthly_amount ?? (float) preg_replace('/[^0-9.]/', '', $rawBaseDeposit);
 
                 $paymentsCount = $userScheme ? $userScheme->payments()->count() : 0;
                 $pendingPayment = $userScheme ? $userScheme->payments()->where('payment_status', 'pending')->orderBy('due_date', 'asc')->first() : null;
@@ -67,6 +72,7 @@
                 </div>
                 @endif
 
+                @if($userScheme)
                 <div id="payment-summary">
                     <div style="text-align: center; margin-bottom: 2.5rem;">
                         <h2 style="margin-bottom: 0.5rem;">Hi {{ explode(' ', auth()->user()->name)[0] }},</h2>
@@ -77,12 +83,12 @@
                             <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                                 <span style="opacity: 0.7;">Scheme Number</span>
                                 <span style="font-weight: 700; color: var(--accent-color);">{{
-                                    auth()->user()->userSchemes->first()?->scheme_number ?? 'Pending Approval' }}</span>
+                                    $userScheme->scheme_number ?? 'Pending Approval' }}</span>
                             </div>
                             <div style="display: flex; justify-content: space-between;">
                                 <span style="opacity: 0.7;">Active Plan</span>
                                 <span style="font-weight: 700; color: var(--heading-color);">{{
-                                    auth()->user()->userSchemes->first()?->investmentPlan->name ?? 'None' }}</span>
+                                    $userPlan->name ?? 'None' }}</span>
                             </div>
                         </div>
 
@@ -163,7 +169,7 @@
                                     Number</label>
                                 <div
                                     style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; border-radius: 10px; font-weight: 700; color: var(--accent-color);">
-                                    {{ auth()->user()->userSchemes->first()?->scheme_number ?? 'Pending Approval' }}
+                                    {{ $userScheme->scheme_number ?? 'Pending Approval' }}
                                 </div>
                             </div>
                             <!-- Row 2 -->
@@ -307,6 +313,116 @@
                         amountInput.addEventListener('input', recalculate);
                     });
                 </script>
+                @else
+                <div id="selection-form">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h2 style="margin-bottom: 0.5rem;">Complete Your Account</h2>
+                        <p style="color: var(--text-secondary);">Select your plan details to start investing</p>
+                    </div>
+
+                    <form action="{{ route('customer.complete_application') }}" method="POST" style="text-align: left;">
+                        @csrf
+                        <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1.5rem; color: var(--heading-color); border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">Address & Identity</h4>
+                            <div class="form-group">
+                                <label>Street & Door No.</label>
+                                <input type="text" name="address" class="form-control" placeholder="e.g. 12-34/A, Golden Street" required>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" name="city" class="form-control" placeholder="e.g. Kakinada" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pincode</label>
+                                    <input type="text" name="pincode" class="form-control" placeholder="6 digits" pattern="[0-9]{6}" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" name="state" class="form-control" placeholder="e.g. Andhra Pradesh" required value="Andhra Pradesh">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Identity Proof (Aadhaar/PAN)</label>
+                                <input type="text" name="identity_proof" class="form-control" placeholder="Enter Aadhaar or PAN number" required>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1.5rem; color: var(--heading-color); border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">Plan & Subscription</h4>
+                            <div class="form-group">
+                                <label>Select Plan</label>
+                                <select name="scheme_id" class="form-control" required onchange="updatePlanDetails(this)">
+                                    <option value="" disabled selected>-- Choose a Plan --</option>
+                                    @foreach($plans as $plan)
+                                        <option value="{{ $plan->id }}" data-term="{{ $plan->term }}" data-base="{{ (float) preg_replace('/[^0-9.]/', '', $plan->base_deposit) }}">{{ $plan->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Monthly Investment Amount (₹)</label>
+                                <input type="number" name="monthly_amount" id="monthly_amount_input" class="form-control" placeholder="Enter amount (Min: 5000)" min="5000" value="5000" required>
+                                <small style="color: #888;">Minimum amount ₹5,000 required.</small>
+                            </div>
+                            <div id="plan-preview" style="display: none; background: white; padding: 1rem; border-radius: 12px; margin-top: 1rem;">
+                                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Term: <strong id="preview-term" style="color: var(--heading-color);">--</strong></p>
+                                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">Total Investment: <strong id="preview-total" style="color: var(--accent-color);">--</strong></p>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 20px; margin-bottom: 2rem;">
+                            <h4 style="margin-bottom: 1.5rem; color: var(--heading-color); border-bottom: 1px solid #ddd; padding-bottom: 0.5rem;">Nominee Information</h4>
+                            <div class="form-group">
+                                <label>Nominee Name</label>
+                                <input type="text" name="nominee_name" class="form-control" placeholder="Full name" required>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Relationship</label>
+                                    <input type="text" name="nominee_relationship" class="form-control" placeholder="e.g. Spouse" required>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label>Contact Number</label>
+                                    <input type="tel" name="nominee_contact" class="form-control" placeholder="10 digits" pattern="[0-9]{10}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-premium" style="width: 100%; border-radius: 15px;">Activate My Plan</button>
+                    </form>
+                </div>
+
+                <script>
+                    function updatePlanDetails(select) {
+                        const option = select.options[select.selectedIndex];
+                        const term = option.getAttribute('data-term');
+                        const base = option.getAttribute('data-base');
+                        const amountInput = document.getElementById('monthly_amount_input');
+                        const preview = document.getElementById('plan-preview');
+                        const previewTerm = document.getElementById('preview-term');
+                        const previewTotal = document.getElementById('preview-total');
+
+                        if (term) {
+                            preview.style.display = 'block';
+                            previewTerm.innerText = term;
+                            amountInput.value = base;
+                            
+                            const termNum = parseInt(term.replace(/[^0-9]/g, '')) || 11;
+                            const total = termNum * parseFloat(amountInput.value);
+                            previewTotal.innerText = '₹ ' + total.toLocaleString();
+
+                            amountInput.oninput = function() {
+                                const newAmount = parseFloat(this.value) || 0;
+                                const newTotal = termNum * newAmount;
+                                previewTotal.innerText = '₹ ' + newTotal.toLocaleString();
+                            };
+                        } else {
+                            preview.style.display = 'none';
+                        }
+                    }
+                </script>
+                @endif
+
                 @elseif(auth()->user()->status == 'pending')
                 <div style="text-align: center; margin-bottom: 2.5rem;">
                     <h2 style="margin-bottom: 0.5rem;">Ready to Invest, {{ explode(' ', auth()->user()->name)[0] }}?
@@ -440,124 +556,63 @@
 
     <!-- JOIN NEW PLAN TAB -->
     <div id="join-new" class="tab-content">
-        <div class="luxury-card">
-            <h2 style="margin-bottom: 3rem; text-align: center;">New Membership Application</h2>
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div class="luxury-card">
+                <h2 style="margin-bottom: 3rem; text-align: center;">New Membership Application</h2>
 
-            @if($errors->any() && !$errors->has('mobile'))
-            <div class="luxury-card"
-                style="background: #fdf2f2; border: 1px solid #f8b4b4; color: #9b1c1c; margin-bottom: 2rem;">
-                <ul style="margin: 0; padding-left: 1.5rem;">
-                    @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                @if($errors->any() && !$errors->has('mobile'))
+                <div class="luxury-card"
+                    style="background: #fdf2f2; border: 1px solid #f8b4b4; color: #9b1c1c; margin-bottom: 2rem;">
+                    <ul style="margin: 0; padding-left: 1.5rem;">
+                        @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+
+                <form action="{{ route('register') }}" method="POST">
+                    @csrf
+                        <!-- Only Personal Information Section -->
+                        <div>
+                            <h4
+                                style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; display: inline-block;">
+                                Personal Information</h4>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" name="name" class="form-control" placeholder="Enter first and last name"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mobile Number</label>
+                                <input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" name="email" class="form-control" placeholder="name@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Account Password</label>
+                                <div style="position: relative;">
+                                    <input type="password" name="password" class="form-control"
+                                        placeholder="Create a strong password" required>
+                                    <i class="fas fa-eye" onclick="const input = this.parentElement.querySelector('input'); if(input.type === 'password') { input.type = 'text'; this.classList.remove('fa-eye'); this.classList.add('fa-eye-slash'); } else { input.type = 'password'; this.classList.remove('fa-eye-slash'); this.classList.add('fa-eye'); }" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
+                                </div>
+                                <small style="font-size: 0.75rem; color: #888;">Minimum 8 characters</small>
+                            </div>
+                        </div>
+
+
+
+
+                    <div style="text-align: center; margin-top: 4rem;">
+                        <button type="submit" class="btn-premium"
+                            style="width: 100%; font-size: 1.1rem; border-radius: 20px;">Submit My Application</button>
+                        <p style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.6;">By submitting, you agree to our
+                            terms and conditions.</p>
+                    </div>
+                </form>
             </div>
-            @endif
-
-            <form action="{{ route('register') }}" method="POST">
-                @csrf
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;">
-                    <!-- Section 1 -->
-                    <div>
-                        <h4
-                            style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; display: inline-block;">
-                            Personal Information</h4>
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" name="name" class="form-control" placeholder="Enter first and last name"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label>Mobile Number</label>
-                            <input type="tel" name="mobile" class="form-control" placeholder="+91 00000 00000" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" class="form-control" placeholder="name@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Account Password</label>
-                            <div style="position: relative;">
-                                <input type="password" name="password" class="form-control"
-                                    placeholder="Create a strong password" required>
-                                <i class="fas fa-eye" onclick="const input = this.parentElement.querySelector('input'); if(input.type === 'password') { input.type = 'text'; this.classList.remove('fa-eye'); this.classList.add('fa-eye-slash'); } else { input.type = 'password'; this.classList.remove('fa-eye-slash'); this.classList.add('fa-eye'); }" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888;"></i>
-                            </div>
-                            <small style="font-size: 0.75rem; color: #888;">Minimum 8 characters</small>
-                        </div>
-                    </div>
-
-                    <!-- Section 2 -->
-                    <div>
-                        <h4
-                            style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; display: inline-block;">
-                            Address Details</h4>
-                        <div class="form-group">
-                            <label>Street & Door No.</label>
-                            <input type="text" name="address" class="form-control" placeholder="e.g. 12-34/A, Golden Street" required>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>City</label>
-                                <input type="text" name="city" class="form-control" placeholder="e.g. Vijayawada" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Pincode</label>
-                                <input type="text" name="pincode" class="form-control" placeholder="6 digits" pattern="[0-9]{6}" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>State</label>
-                            <input type="text" name="state" class="form-control" placeholder="e.g. Andhra Pradesh" required>
-                        </div>
-                    </div>
-
-                    <!-- Section 3 -->
-                    <div>
-                        <h4
-                            style="margin-bottom: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; display: inline-block;">
-                            Plan Selection</h4>
-                        <div class="form-group">
-                            <label>Identity Proof (Aadhaar/PAN)</label>
-                            <input type="text" name="identity_proof" class="form-control" placeholder="Enter Aadhaar or PAN number" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Select Plan Category</label>
-                            <select name="plan_category" id="plan_category_select" class="form-control">
-                                @foreach($plans as $plan)
-                                <option value="{{ $plan->name }}">{{ $plan->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Section 4 (Full Width) -->
-                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px dashed #eee;">
-                    <h4 style="margin-bottom: 2rem; color: var(--heading-color);">Nominee Information</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-                        <div class="form-group">
-                            <label>Nominee Name</label>
-                            <input type="text" name="nominee_name" class="form-control" placeholder="Enter nominee's full name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Relationship</label>
-                            <input type="text" name="nominee_relationship" class="form-control" placeholder="e.g. Spouse, Parent" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nominee Contact</label>
-                            <input type="tel" name="nominee_contact" class="form-control" placeholder="10-digit number" pattern="[0-9]{10}" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="text-align: center; margin-top: 4rem;">
-                    <button type="submit" class="btn-premium"
-                        style="min-width: 320px; font-size: 1.1rem; border-radius: 20px;">Submit My Application</button>
-                    <p style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.6;">By submitting, you agree to our
-                        terms and conditions.</p>
-                </div>
-            </form>
         </div>
     </div>
 

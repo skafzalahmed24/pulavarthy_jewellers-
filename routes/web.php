@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/customer/payment/create-order', [App\Http\Controllers\PaymentController::class, 'createOrder'])->name('payment.create_order');
     Route::post('/customer/payment/verify', [App\Http\Controllers\PaymentController::class, 'verifyPayment'])->name('payment.verify');
     Route::post('/customer/request-grace', [App\Http\Controllers\PaymentController::class, 'requestGrace'])->name('customer.request_grace');
+    Route::post('/customer/complete-application', [App\Http\Controllers\CustomerDashboardController::class, 'completeApplication'])->name('customer.complete_application');
 });
 
 // Admin Routes

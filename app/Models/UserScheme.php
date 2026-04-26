@@ -13,6 +13,7 @@ class UserScheme extends Model
         'user_id',
         'scheme_id',
         'scheme_number',
+        'monthly_amount',
     ];
 
     public function user()

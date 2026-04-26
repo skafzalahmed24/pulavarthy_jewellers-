@@ -48,7 +48,7 @@
                             
                             <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; font-size: 0.95rem;">
                                 <span style="color: var(--text-secondary);">Monthly Amt</span>
-                                <strong style="color: var(--heading-color);">₹ {{ number_format($scheme->investmentPlan->installment_amount, 2) }}</strong>
+                                <strong style="color: var(--heading-color);">₹ {{ number_format($scheme->monthly_amount ?? ($scheme->investmentPlan->installment_amount ?? 0), 2) }}</strong>
                             </div>
 
                             <a href="{{ route('customer.scheme_details', $scheme->id) }}" class="btn-premium" style="display: block; text-align: center; padding: 1rem; width: 100%;">

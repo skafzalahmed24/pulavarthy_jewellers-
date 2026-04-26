@@ -31,7 +31,8 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        return view('admin.customers.create');
+        $plans = \App\Models\InvestmentPlan::all();
+        return view('admin.customers.create', compact('plans'));
     }
 
     /**

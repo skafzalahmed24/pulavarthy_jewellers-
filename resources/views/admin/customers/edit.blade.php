@@ -101,6 +101,7 @@
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Plan Category</label>
                     <select name="plan_category" class="form-control"
                         style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+                        <option value="" {{ !($customer->userSchemes->first()) ? 'selected' : '' }}>-- Not Selected (User picks after approval) --</option>
                         @foreach($plans as $plan)
                         <option value="{{ $plan->name }}" {{ ($customer->userSchemes->first()?->investmentPlan->name ?? '') == $plan->name ? 'selected' : ''
                             }}>

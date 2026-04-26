@@ -80,8 +80,10 @@
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Plan Category</label>
                     <select name="plan_category" class="form-control"
                         style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
-                        <option value="Gold Saver (11 Months)">Gold Saver (11 Months)</option>
-                        <option value="Elite Diamond (12 Months)">Elite Diamond (12 Months)</option>
+                        <option value="" selected>-- Not Selected (User picks after approval) --</option>
+                        @foreach($plans as $plan)
+                        <option value="{{ $plan->name }}">{{ $plan->name }}</option>
+                        @endforeach
                     </select>
                 </div>
 

@@ -31,7 +31,7 @@
             <div class="grid-container grid-3" style="margin-bottom: 3rem;">
                 <div style="background: #fcfcfc; padding: 1.5rem; border-radius: 10px; border: 1px solid #eee;">
                     <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.5rem; font-weight: 600;">Monthly Installment</p>
-                    <h4 style="color: var(--heading-color); font-size: 1.5rem;">₹ {{ number_format($userScheme->investmentPlan->installment_amount ?? 0, 2) }}</h4>
+                    <h4 style="color: var(--heading-color); font-size: 1.5rem;">₹ {{ number_format($userScheme->monthly_amount ?? ($userScheme->investmentPlan->installment_amount ?? 0), 2) }}</h4>
                 </div>
                 <div style="background: #fcfcfc; padding: 1.5rem; border-radius: 10px; border: 1px solid #eee;">
                     <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.5rem; font-weight: 600;">Duration (Months)</p>
@@ -59,6 +59,8 @@
                                 <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;"># ID</th>
                                 <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Due Date</th>
                                 <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Amount</th>
+                                <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Gold Rate</th>
+                                <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Weight (g)</th>
                                 <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Status</th>
                                 <th style="padding: 1.2rem 1rem; border-bottom: 1px solid #eee; font-weight: 700;">Action</th>
                             </tr>
@@ -72,6 +74,12 @@
                                         {{ $payment->due_date ? $payment->due_date->format('d M Y') : 'N/A' }}
                                     </td>
                                     <td data-label="Amount" style="padding: 1.2rem 1rem; font-weight: bold; color: var(--heading-color);">₹ {{ number_format($payment->payable_amount, 2) }}</td>
+                                    <td data-label="Gold Rate" style="padding: 1.2rem 1rem; color: #7f8c8d;">
+                                        {{ $payment->current_gold_rate ? '₹ '.number_format($payment->current_gold_rate, 2) : '---' }}
+                                    </td>
+                                    <td data-label="Weight" style="padding: 1.2rem 1rem; font-weight: bold; color: var(--accent-color);">
+                                        {{ $payment->current_gold_rate && $payment->payment_status == 'paid' ? number_format($payment->payable_amount / $payment->current_gold_rate, 3) . ' g' : '---' }}
+                                    </td>
                                     @php
                                         $isPaid = $payment->payment_status === 'paid';
                                         $isPending = $payment->payment_status === 'pending';

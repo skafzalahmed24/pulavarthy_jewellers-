@@ -5,8 +5,8 @@
 @section('content')
 <div class="dashboard-header">
     <div>
-        <h1>Grace Period Requests</h1>
-        <p style="color: var(--text-secondary);">Review and approve payment deadline extensions requested by customers.</p>
+        <h1>Pending Approvals</h1>
+        <p style="color: var(--text-secondary);">Review and approve new registrations to the platform.</p>
     </div>
 </div>
 

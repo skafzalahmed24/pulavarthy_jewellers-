@@ -16,7 +16,7 @@ class PaymentController extends Controller
         }
 
         $baseDepositRaw = $userScheme->investmentPlan->base_deposit;
-        $payableAmount = (float) preg_replace('/[^0-9.]/', '', $baseDepositRaw);
+        $payableAmount = $userScheme->monthly_amount ?? (float) preg_replace('/[^0-9.]/', '', $baseDepositRaw);
 
         // Fetch Razorpay credentials from env
         $keyId = env('RAZORPAY_KEY', 'rzp_test_placeholder');
@@ -69,7 +69,7 @@ class PaymentController extends Controller
         $user = auth()->user();
         $userScheme = $user->userSchemes()->first();
         $baseDepositRaw = $userScheme->investmentPlan->base_deposit;
-        $payableAmount = (float) preg_replace('/[^0-9.]/', '', $baseDepositRaw);
+        $payableAmount = $userScheme->monthly_amount ?? (float) preg_replace('/[^0-9.]/', '', $baseDepositRaw);
         
         $goldPriceObj = \App\Models\MetalPrice::where('metal_name', 'Gold')->first();
         $todaysRate = $goldPriceObj ? (float) preg_replace('/[^0-9.]/', '', $goldPriceObj->today_price) : 0;
