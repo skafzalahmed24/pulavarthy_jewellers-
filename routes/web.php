@@ -37,6 +37,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/customer/payment/verify', [App\Http\Controllers\PaymentController::class, 'verifyPayment'])->name('payment.verify');
     Route::post('/customer/request-grace', [App\Http\Controllers\PaymentController::class, 'requestGrace'])->name('customer.request_grace');
     Route::post('/customer/complete-application', [App\Http\Controllers\CustomerDashboardController::class, 'completeApplication'])->name('customer.complete_application');
+    Route::post('/customer/enroll-save-data', [App\Http\Controllers\CustomerDashboardController::class, 'saveEnrollmentDataAjax'])->name('customer.enroll_scheme_ajax');
+    Route::post('/customer/enroll-verify-payment', [App\Http\Controllers\PaymentController::class, 'enrollVerifyPayment'])->name('customer.enroll_verify_payment');
 });
 
 // Admin Routes

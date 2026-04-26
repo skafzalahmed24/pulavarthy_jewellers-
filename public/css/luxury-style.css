@@ -1,16 +1,17 @@
 :root {
-    --heading-color: #1a1a1a;
-    --accent-color: #9f1f63;
-    --accent-light: #fce4ec;
-    --accent-gradient: linear-gradient(135deg, #9f1f63 0%, #6d1544 100%);
+    --heading-color: #2c2c2c;
+    --accent-color: #a12a67; /* Lite Gold */
+    --accent-light: #fff0f5; /* Lightish Pink */
+    --accent-pink: hsl(339, 81%, 85%);
+    --accent-gradient:#a12a67;
     --bg-primary: #ffffff;
     --bg-secondary: #fffafa;
-    --text-primary: #333333;
-    --text-secondary: #666666;
+    --text-primary: #444444;
+    --text-secondary: #777777;
     --white: #ffffff;
-    --shadow-soft: 0 10px 40px rgba(159, 31, 99, 0.05);
-    --shadow-accent: 0 10px 30px rgba(159, 31, 99, 0.2);
-    --glass: rgba(255, 255, 255, 0.85);
+    --shadow-soft: 0 10px 40px rgba(197, 160, 89, 0.08);
+    --shadow-accent: 0 10px 30px rgba(197, 160, 89, 0.2);
+    --glass: rgba(255, 255, 255, 0.9);
 
     /* Spacing Constants */
     --section-padding: 8rem 2rem;
@@ -289,6 +290,8 @@ h4 {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: var(--shadow-accent);
     text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 @keyframes fadeInUp {
@@ -416,6 +419,8 @@ header.scrolled {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    width: 100%;
+    justify-content: flex-end;
 }
 
 .logo-img {
@@ -460,7 +465,7 @@ nav ul li a:hover::after {
     width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 986px) {
     .menu-toggle {
         display: block;
     }
@@ -489,6 +494,11 @@ nav ul li a:hover::after {
 
     nav ul li a {
         font-size: 1.2rem;
+    }
+
+    /* Center hero button on stacked layouts */
+    .hero-btn-container {
+        justify-content: center !important;
     }
 }
 
@@ -798,13 +808,14 @@ nav ul li a:hover::after {
 
 .form-group label {
     display: block;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
     font-weight: 600;
     color: var(--heading-color);
 }
 
 .form-control {
     width: 100%;
+    box-sizing: border-box;
     padding: 1.2rem 1.5rem;
     border: 2px solid #f0f0f0;
     border-radius: 15px;
@@ -812,6 +823,7 @@ nav ul li a:hover::after {
     font-family: inherit;
     font-size: 1rem;
     transition: all 0.3s ease;
+    display: block;
 }
 
 .form-control:focus {
@@ -1006,3 +1018,1072 @@ footer h4 {
         flex: 1 1 100%;
     }
 }
+
+/* Multi-step Stepper */
+.stepper-wrapper {
+    display: flex;
+    gap: 4rem;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.stepper-nav {
+    flex: 0 0 300px;
+    position: sticky;
+    top: 120px;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.5;
+}
+
+.step-item.active {
+    opacity: 1;
+}
+
+.step-item.completed {
+    opacity: 0.8;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 17.5px;
+    top: 40px;
+    width: 2px;
+    height: 35px;
+    background: #eee;
+}
+
+.step-item.active:not(:last-child)::after,
+.step-item.completed:not(:last-child)::after {
+    background: var(--accent-color);
+}
+
+.step-number {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.step-item.active .step-number {
+    background: var(--accent-light);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(159, 31, 99, 0.1);
+}
+
+.step-item.completed .step-number {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.step-label {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+}
+
+.step-item.active .step-label {
+    color: var(--heading-color);
+}
+
+.stepper-content {
+    flex: 1;
+    min-width: 0; /* Fix flexbox shrink issue */
+}
+
+/* Address Card */
+.address-card {
+    border: 2px solid #eee;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    position: relative;
+    background: #fff;
+    text-align: left;
+}
+
+.address-card.selected {
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+.address-icon {
+    width: 40px;
+    height: 40px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+}
+
+.address-details h5 {
+    margin-bottom: 0.3rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: var(--heading-color);
+}
+
+.address-details p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.address-card-check {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.address-card.selected .address-card-check {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.address-card.selected .address-card-check::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #fff;
+    font-size: 0.7rem;
+}
+
+.add-address-btn {
+    border: 1px dashed #ddd;
+    padding: 1.2rem;
+    text-align: center;
+    color: var(--accent-color);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.add-address-btn:hover {
+    background: var(--accent-light);
+    border-color: var(--accent-color);
+}
+
+/* Sidebar/Drawer for Address Form */
+.address-drawer {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 450px;
+    height: 100%;
+    background: #fff;
+    z-index: 2000;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+    transition: right 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    overflow-y: auto;
+    text-align: left;
+}
+
+.address-drawer.active {
+    right: 0;
+}
+
+.drawer-header {
+    padding: 2rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+}
+
+.drawer-body {
+    padding: 2rem;
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1999;
+    display: none;
+    backdrop-filter: blur(4px);
+}
+
+/* Detail Summary Items */
+.summary-block {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+
+.summary-item {
+    padding: 1.2rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-item label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.summary-item span {
+    font-weight: 600;
+    color: var(--heading-color);
+    font-size: 1.1rem;
+}
+
+/* Payment Methods */
+.payment-method-card {
+    border: 2px solid #eee;
+    padding: 1.5rem;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.payment-method-card.selected {
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 991px) {
+    .stepper-wrapper {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .stepper-nav {
+        flex: none;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        padding: 0 1rem 1.5rem;
+        position: static;
+        white-space: nowrap;
+        gap: 2rem;
+    }
+    .step-item {
+        flex: 0 0 auto;
+        margin-bottom: 0;
+        gap: 0.8rem;
+    }
+    .step-item:not(:last-child)::after {
+        display: none;
+    }
+    .step-label {
+        font-size: 0.9rem;
+    }
+    .address-drawer {
+        width: 100%;
+    }
+}
+
+/* Dashboard Card */
+.dashboard-card {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed #eee;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.header-row:last-child {
+    margin-bottom: 0;
+}
+
+.header-row .label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.header-row .value {
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-align: right;
+}
+
+.header-row .value.accent {
+    color: var(--accent-color);
+}
+
+.header-row .value.heading {
+    color: var(--heading-color);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.grid-item {
+    background: var(--bg-secondary);
+    padding: 1.2rem;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.grid-item.full-width {
+    grid-column: span 2;
+}
+
+.grid-item label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.grid-item span {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.grid-item span.due-date { color: #c0392b; }
+.grid-item span.amount { color: var(--heading-color); }
+.grid-item span.weight { color: var(--accent-color); }
+
+.status-badge {
+    padding: 1.2rem;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.status-badge.success { background: #e8f5e9; color: #2e7d32; }
+.status-badge.info { background: #e3f2fd; color: #1976d2; }
+.status-badge.warning { background: #fff8e1; color: #f9a825; }
+.status-badge.danger { background: #ffebee; color: #c62828; }
+
+.btn-premium.danger {
+    background: #c0392b;
+}
+
+/* Enrollment Form Width */
+.enrollment-wide {
+    max-width: 1000px !important;
+    width: 95%;
+}
+
+/* Address Drawer & Overlay */
+.drawer-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.address-drawer {
+    position: fixed;
+    top: 0;
+    right: -450px;
+    width: 450px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+    z-index: 2001;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+}
+
+.address-drawer.active {
+    right: 0;
+    visibility: visible;
+}
+
+.drawer-header {
+    padding: 2rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+
+.drawer-body {
+    padding: 2.5rem;
+    overflow-y: auto;
+}
+
+.drawer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 480px) {
+    .address-drawer {
+        width: 100%;
+        right: -100%;
+    }
+    .drawer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .dashboard-card {
+        padding: 1.5rem;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .grid-item.full-width {
+        grid-column: span 1;
+    }
+
+    .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .header-row .value {
+        text-align: left;
+    }
+
+    .tabs-nav {
+        gap: 0.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .tab-btn {
+        padding: 0.8rem 0.5rem;
+        flex: 1 1 calc(33.33% - 0.5rem);
+        font-size: 0.7rem;
+        text-align: center;
+        letter-spacing: 0;
+    }
+}
+
+/* New Form & Stepper refinements */
+.action-grid {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.action-grid-single {
+    justify-content: flex-end;
+}
+
+.action-grid .btn-premium {
+    flex: 1;
+}
+
+.step-surface {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 20px;
+    margin-top: 2rem;
+    box-shadow: 0 10px 40px rgba(197, 160, 89, 0.05);
+    border: 1px solid rgba(197, 160, 89, 0.1);
+    background: linear-gradient(to bottom right, #ffffff, #fffafa);
+}
+
+.step-heading {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: var(--heading-color);
+    font-family: 'Playfair Display', serif;
+}
+
+.step-section-title {
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.form-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+    .action-grid {
+        flex-direction: column-reverse;
+        gap: 1rem;
+    }
+}
+
+.amount-option {
+    padding: 0.8rem 1.5rem;
+    background: #fff;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    color: var(--text-secondary);
+}
+
+.amount-option:hover, .amount-option.active {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+.field-note {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+/* Lite Gold & Lightish Pink palette additions */
+.btn-premium.btn-secondary {
+    background: #fff;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    box-shadow: none;
+}
+
+.btn-premium.btn-secondary:hover {
+    background: var(--accent-light);
+    transform: translateY(-2px);
+}
+
+.step-item.active .step-number {
+    background: var(--accent-light);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.step-item.completed .step-number {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.address-card.selected {
+    border-color: var(--accent-color);
+    background: #fff9fa; /* Very subtle pink tint */
+}
+
+/* ── Account Section ── */
+.account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+}
+
+.btn-logout-pill {
+    background: transparent !important;
+    border: 1.5px solid var(--accent-color) !important;
+    color: var(--accent-color) !important;
+    padding: 0.5rem 1.4rem !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: none !important;
+    font-size: 0.88rem;
+    border-radius: 50px !important;
+    white-space: nowrap;
+}
+
+.btn-logout-pill:hover {
+    background: var(--accent-light) !important;
+    transform: translateY(-1px);
+}
+
+.account-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+}
+
+@media (max-width: 600px) {
+    .account-details-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .account-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-logout-pill {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   MOBILE RESPONSIVE — No Horizontal Scroll
+   ======================================== */
+
+/* Prevent all horizontal overflow at root level */
+html, body {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Enrollment form sizing */
+.enrollment-wide {
+    max-width: 1000px !important;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stepper-wrapper {
+    overflow: visible;
+    margin-bottom: 2rem;
+}
+
+/* ---- Breakpoint: ≤ 768px (tablets / large phones) ---- */
+@media (max-width: 1024px) {
+    .tabs-container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .tabs-nav {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 0.75rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 0.35rem;
+        margin-bottom: 2rem;
+    }
+
+    .tabs-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        flex: 0 0 auto;
+        min-width: max-content;
+        white-space: nowrap;
+    }
+
+    .stepper-wrapper {
+        display: block;
+        overflow: hidden;
+    }
+
+    .stepper-nav {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        position: relative;
+        top: auto;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.25rem;
+        border-bottom: 2px solid #f0e8d5;
+    }
+
+    .stepper-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .step-item {
+        flex: 0 0 148px;
+        min-width: 148px;
+        margin-bottom: 0;
+        padding: 0.6rem 0.75rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        text-align: center;
+        opacity: 0.75;
+    }
+
+    .step-item:not(:last-child)::after {
+        left: calc(100% - 8px);
+        top: 18px;
+        width: 16px;
+        height: 2px;
+    }
+
+    .step-label {
+        font-size: 0.82rem;
+        line-height: 1.35;
+        white-space: normal;
+        max-width: 100%;
+    }
+
+    .step-number {
+        margin: 0 auto;
+    }
+
+    .stepper-content,
+    .selection-form,
+    #multi-step-form,
+    .step-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .form-grid,
+    .summary-grid,
+    .summary-bank-grid,
+    .drawer-grid,
+    .action-grid {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .form-group,
+    .form-control,
+    select.form-control,
+    input.form-control,
+    textarea.form-control {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Global box model */
+    * { box-sizing: border-box; }
+
+    /* Section padding */
+    .section-standard { padding: 2rem 1rem !important; }
+
+    /* Tabs */
+    .tab-btn {
+        font-size: 0.78rem;
+        padding: 0.75rem 1rem;
+        text-align: center;
+    }
+
+    /* Enrollment form — full width on mobile */
+    .enrollment-wide {
+        width: 100% !important;
+        padding: 0;
+    }
+
+    /* Stepper nav — scrollable row of steps */
+    .stepper-nav {
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.2rem;
+    }
+
+    .step-item {
+        flex: 0 0 124px;
+        min-width: 124px;
+        padding: 0.45rem 0.5rem 0.85rem;
+    }
+
+    .step-label {
+        font-size: 0.72rem;
+    }
+
+    .step-number {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .step-item:not(:last-child)::after {
+        width: 12px;
+    }
+
+    /* Step surface — tighter padding */
+    .step-surface {
+        padding: 1.2rem;
+        margin-top: 1rem;
+        border-radius: 14px;
+    }
+
+    .step-heading {
+        font-size: 1.3rem;
+        margin-bottom: 1.2rem;
+    }
+
+    /* Form grids — single column on mobile */
+    .form-grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    /* Action buttons — stack vertically */
+    .action-grid {
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+    }
+
+    .action-grid .btn-premium {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* User details readonly grid */
+    .form-grid-readonly {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-grid-readonly [style*="grid-column: span 2"] {
+        grid-column: span 1 !important;
+    }
+
+    /* Pay-now card */
+    .pay-now-card {
+        padding: 1.25rem 0.9rem;
+        border-radius: 16px;
+    }
+
+    .pay-now-shell {
+        width: 100% !important;
+        padding: 0;
+    }
+
+    /* Amount option chips — wrapping row */
+    .amount-option {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Summary cards */
+    .summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+    }
+
+    .summary-block {
+        padding: 1.2rem;
+    }
+
+    /* Dashboard cards */
+    .dashboard-card {
+        padding: 1.2rem 1rem;
+        border-radius: 14px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .grid-item.full-width {
+        grid-column: span 1;
+    }
+
+    /* Header row */
+    .header-row {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .header-row .value {
+        text-align: left;
+    }
+
+    /* Payment method cards */
+    .payment-method-card {
+        padding: 1rem;
+    }
+
+    /* Drawer — full width on small screens */
+    .address-drawer {
+        width: 100% !important;
+        right: -100% !important;
+    }
+
+    .address-drawer.active {
+        right: 0 !important;
+    }
+
+    .drawer-body {
+        padding: 1.5rem 1rem;
+    }
+
+    .drawer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Luxury card inner padding */
+    .luxury-card {
+        padding: 1.2rem 0.9rem;
+    }
+
+    /* Selection form intro */
+    .selection-intro {
+        text-align: center;
+        padding: 0 0.5rem;
+    }
+
+    .selection-intro h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Prevent any element from causing overflow */
+    .step-content,
+    .stepper-wrapper,
+    .stepper-content,
+    .selection-form {
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+}
+
+/* ---- Breakpoint: ≤ 480px (small phones) ---- */
+@media (max-width: 480px) {
+
+    /* Tighter section padding */
+    .section-standard { padding: 1.5rem 0.5rem !important; }
+
+    /* Tabs — row of 2 per line */
+    .tab-btn {
+        font-size: 0.72rem;
+        padding: 0.65rem 0.9rem;
+    }
+
+    .step-label {
+        font-size: 0.65rem;
+    }
+
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+
+    .step-item {
+        flex-basis: 108px;
+        min-width: 108px;
+    }
+
+    /* Card full bleed */
+    .luxury-card {
+        border-radius: 12px;
+        padding: 1rem 0.75rem;
+    }
+
+    .step-surface {
+        padding: 1rem 0.75rem;
+        border-radius: 12px;
+    }
+
+    /* Step heading */
+    .step-heading {
+        font-size: 1.15rem;
+    }
+
+    /* Buttons */
+    .btn-premium {
+        padding: 0.9rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    /* Amount options wrap */
+    .amount-option {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+

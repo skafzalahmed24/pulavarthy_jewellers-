@@ -173,4 +173,80 @@ class PaymentController extends Controller
 
         return back()->with('success', 'Grace period extension requested successfully. Admin will review your request.');
     }
+    public function enrollVerifyPayment(Request $request)
+    {
+        $keyId = env('RAZORPAY_KEY', 'rzp_test_placeholder');
+        $keySecret = env('RAZORPAY_SECRET', 'secret_placeholder');
+        
+        try {
+            $api = new \Razorpay\Api\Api($keyId, $keySecret);
+            $attributes = [
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_signature' => $request->razorpay_signature
+            ];
+            $api->utility->verifyPaymentSignature($attributes);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Payment verification failed: ' . $e->getMessage()], 400);
+        }
+
+        $userScheme = \App\Models\UserScheme::findOrFail($request->enrollment_id);
+        $userScheme->update(['status' => 'active']); // Assuming 'active' is the status
+
+        $payableAmount = $userScheme->monthly_amount;
+        $goldPriceObj = \App\Models\MetalPrice::where('metal_name', 'Gold')->first();
+        $todaysRate = $goldPriceObj ? (float) preg_replace('/[^0-9.]/', '', $goldPriceObj->today_price) : 0;
+
+        // Generate scheme number
+        $plan = $userScheme->investmentPlan;
+        if (is_null($userScheme->scheme_number) && $plan && $plan->scheme_prefix) {
+            $prefix = $plan->scheme_prefix;
+            $lastScheme = \App\Models\UserScheme::where('scheme_number', 'LIKE', $prefix . '%')
+                ->orderBy('scheme_number', 'desc')
+                ->first();
+
+            $newNumber = 1;
+            if ($lastScheme) {
+                $lastNumber = intval(substr($lastScheme->scheme_number, strlen($prefix)));
+                $newNumber = $lastNumber + 1;
+            }
+
+            $userScheme->update([
+                'scheme_number' => $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT),
+            ]);
+        }
+
+        // Create the first paid payment
+        \App\Models\Payment::create([
+            'user_scheme_id' => $userScheme->id,
+            'payment_id' => $request->razorpay_payment_id,
+            'current_gold_rate' => $todaysRate,
+            'payable_amount' => $payableAmount,
+            'due_date' => now(),
+            'next_due_date' => now()->addDays(30),
+            'grace_start_date' => now()->addDays(1),
+            'grace_end_date' => now()->addDays(7),
+            'payment_status' => 'paid',
+        ]);
+
+        // Generate pending months
+        $totalTerms = $plan && $plan->term ? (int) preg_replace('/[^0-9]/', '', $plan->term) : 11;
+        $baseDueDate = now();
+        for ($i = 1; $i < $totalTerms; $i++) {
+            $dueDate = $baseDueDate->copy()->addDays(30 * $i);
+            \App\Models\Payment::create([
+                'user_scheme_id' => $userScheme->id,
+                'payment_id' => null,
+                'current_gold_rate' => null,
+                'payable_amount' => $payableAmount,
+                'due_date' => $dueDate,
+                'next_due_date' => $i == ($totalTerms - 1) ? null : $dueDate->copy()->addDays(30),
+                'grace_start_date' => $dueDate->copy()->addDays(1),
+                'grace_end_date' => $dueDate->copy()->addDays(7),
+                'payment_status' => 'pending',
+            ]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Enrollment and payment successful.']);
+    }
 }

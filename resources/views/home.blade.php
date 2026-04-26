@@ -38,19 +38,21 @@
         overflow: hidden;
         box-shadow: 0 20px 50px rgba(0,0,0,0.08); 
         position: relative;
+        background: #f0f0f0; /* Fallback color */
     }
     .image-frame img {
         width: 100%;
         height: 100%;
         object-fit: cover; 
+        object-position: center;
         display: block;
     }
     
     @media (max-width: 991px) {
         .split-hero { flex-direction: column; }
         .split-hero-content { padding: 4rem 5%; text-align: center; align-items: center; }
-        .split-hero-image { padding: 1rem; }
-        .image-frame { height: auto; max-height: 60vh; aspect-ratio: 4/3; }
+        .split-hero-image { padding: 1.5rem; }
+        .image-frame { height: auto; min-height: 450px; }
     }
 
     .hero-title {
@@ -105,7 +107,7 @@
             <h1 class="hero-title">Timeless Beauty,<br><span style="color: var(--accent-color);">Smart</span> Investment</h1>
             <p class="hero-subtitle">Make your luxury dreams a reality. Join our secure, systematic gold purchase plans with exclusive bonuses and absolute trust.</p>
             
-            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div class="hero-btn-container" style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
                 <a href="{{ url('/purchase-plan') }}" class="btn-premium" style="padding: 1rem 2.5rem; border-radius: 12px; font-size: 1rem;">Explore Plans <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
             </div>
 
@@ -132,7 +134,9 @@
         
         <!-- The premium uncropped image frame -->
         <div class="image-frame" style="z-index: 1;">
-            <img src="{{ asset('img/image (1).jpg') }}" alt="Premium Jewellery Collection" onerror="this.src='https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'">
+            <img src="{{ asset('img/image (1).jpg') }}" alt="Premium Jewellery Collection" 
+                 class="banner-image"
+                 onerror="if(window.innerWidth <= 768 || window.innerWidth > 991) { this.src='https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'; } else { this.style.display='none'; }">
         </div>
         
         <!-- Trust Badge Overlay -->
@@ -174,9 +178,7 @@
                 
                 <div style="margin-top: 1rem;">
                     @if(isset($prices['Gold']))
-                        @if($prices['Gold']->today_price > $prices['Gold']->yesterday_price)
-                            <span style="display: inline-flex; align-items: center; background: #e8f5e9; color: #2e7d32; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;"><i class="fas fa-caret-up" style="margin-right: 5px;"></i> Market Up</span>
-                        @elseif($prices['Gold']->today_price < $prices['Gold']->yesterday_price)
+                        @if($prices['Gold']->today_price < $prices['Gold']->yesterday_price)
                             <span style="display: inline-flex; align-items: center; background: #ffebee; color: #c62828; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;"><i class="fas fa-caret-down" style="margin-right: 5px;"></i> Market Down</span>
                         @endif
                     @endif
@@ -199,9 +201,7 @@
                 
                 <div style="margin-top: 1rem;">
                     @if(isset($prices['Silver']))
-                        @if($prices['Silver']->today_price > $prices['Silver']->yesterday_price)
-                            <span style="display: inline-flex; align-items: center; background: #e8f5e9; color: #2e7d32; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;"><i class="fas fa-caret-up" style="margin-right: 5px;"></i> Market Up</span>
-                        @elseif($prices['Silver']->today_price < $prices['Silver']->yesterday_price)
+                        @if($prices['Silver']->today_price < $prices['Silver']->yesterday_price)
                             <span style="display: inline-flex; align-items: center; background: #ffebee; color: #c62828; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;"><i class="fas fa-caret-down" style="margin-right: 5px;"></i> Market Down</span>
                         @endif
                     @endif
@@ -254,7 +254,7 @@
         </div>
 
         <div style="text-align: center;">
-            <a href="{{ url('/purchase-plan') }}" class="btn-premium" style="padding: 1.2rem 3.5rem; font-size: 1.05rem; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px;">Explore Purchase Plans <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+            <a href="{{ url('/purchase-plan') }}" class="btn-premium" style="padding: 1.2rem 3.5rem; font-size: 1.05rem; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px;">Explore Purchase Plans </a>
         </div>
     </div>
 </section>

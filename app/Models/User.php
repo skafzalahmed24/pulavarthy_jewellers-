@@ -28,10 +28,17 @@ class User extends Authenticatable
         'pincode',
         'state',
         'identity_proof',
+        'identity_proof_type',
+        'pan_number',
         'plan_category',
         'nominee_name',
         'nominee_relationship',
         'nominee_contact',
+        'dob',
+        'wedding_anniversary',
+        'bank_acc_no',
+        'bank_branch',
+        'ifsc_code',
         'status',
     ];
 
