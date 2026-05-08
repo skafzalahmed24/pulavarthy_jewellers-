@@ -101,7 +101,7 @@
                                         @elseif($showOverdue)
                                             <span style="background: #ffebee; color: #c62828; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Overdue</span>
                                         @elseif($showNotDueDate)
-                                            <span style="background: #fff3e0; color: #ef6c00; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Not Due Date</span>
+                                            <span style="background: #fff3e0; color: #ef6c00; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Not Yet Date</span>
                                         @else
                                             <span style="background: #fff3e0; color: #ef6c00; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block;">{{ ucfirst($payment->payment_status) }}</span>
                                         @endif

@@ -23,7 +23,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email Address</label>
-                    <input type="email" name="email" class="form-control" required
+                    <input type="email" name="email" class="form-control"
                         style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
                 </div>
                 <div class="form-group" style="margin-bottom: 1.5rem;">

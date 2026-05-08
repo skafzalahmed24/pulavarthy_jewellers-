@@ -13,6 +13,24 @@
     </a>
 </div>
 
+<!-- Rates Quick View -->
+<div class="grid-container grid-2" style="margin-bottom: 2rem;">
+    <div class="luxury-card" style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="font-size: 3rem; color: #f7d08a;"><i class="fas fa-coins"></i></div>
+        <div>
+            <h4 style="margin: 0; font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Current Gold Rate</h4>
+            <div style="font-size: 1.8rem; font-weight: 700; color: var(--heading-color); margin-top: 0.3rem;">₹{{ isset($prices) && $prices->has('Gold') ? $prices['Gold']->today_price : '--' }} <small style="font-size: 1rem; font-weight: normal; color: var(--text-secondary);">/ g</small></div>
+        </div>
+    </div>
+    <div class="luxury-card" style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="font-size: 3rem; color: #c0c0c0;"><i class="fas fa-coins"></i></div>
+        <div>
+            <h4 style="margin: 0; font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Current Silver Rate</h4>
+            <div style="font-size: 1.8rem; font-weight: 700; color: var(--heading-color); margin-top: 0.3rem;">₹{{ isset($prices) && $prices->has('Silver') ? $prices['Silver']->today_price : '--' }} <small style="font-size: 1rem; font-weight: normal; color: var(--text-secondary);">/ g</small></div>
+        </div>
+    </div>
+</div>
+
 @if(session('success'))
 <div class="luxury-card alert-auto-dismiss"
     style="background: #e8f5e9; color: #2e7d32; padding: 1rem; margin-bottom: 2rem; border-radius: 12px; font-weight: 600;">
@@ -52,22 +70,35 @@
                         {{ $payment->current_gold_rate && $payment->payment_status == 'paid' ? number_format($payment->payable_amount / $payment->current_gold_rate, 3) . ' g' : 'N/A' }}
                     </td>
                     <td style="padding: 1.5rem 2rem;">
+                        @php
+                            $isFuturePayment = now()->format('Y-m') < \Carbon\Carbon::parse($payment->due_date)->format('Y-m');
+                        @endphp
                         @if($payment->payment_status == 'paid')
-                        <span style="background: #e8f5e9; color: #2e7d32; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Paid</span>
+                            <span style="background: #e8f5e9; color: #2e7d32; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Paid</span>
                         @elseif($payment->payment_status == 'pending')
-                        <span style="background: #fff8e1; color: #f9a825; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Pending</span>
+                            @if($isOverdue)
+                                <span style="background: #ffebee; color: #c62828; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Overdue</span>
+                            @elseif($isFuturePayment)
+                                <span style="background: #e3f2fd; color: #1565c0; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Not Yet Due</span>
+                            @else
+                                <span style="background: #fff8e1; color: #f9a825; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">Due</span>
+                            @endif
                         @else
-                        <span style="background: #f1f3f5; color: #495057; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">{{ ucfirst($payment->payment_status) }}</span>
+                            <span style="background: #f1f3f5; color: #495057; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">{{ ucfirst($payment->payment_status) }}</span>
                         @endif
                         
                         @if($payment->grace_extension_status == 'approved')
                             <div style="font-size: 0.75rem; color: #e67e22; margin-top: 5px; font-weight: bold;">
                                 <i class="fas fa-clock"></i> Grace: {{ \Carbon\Carbon::parse($payment->grace_end_date)->format('d M') }}
                             </div>
-                        @endif
-
-                        @if($isOverdue)
-                            <div class="badge-outdated" style="margin-top: 5px; display: inline-block;">OVERDUE</div>
+                        @elseif($payment->grace_extension_status == 'pending')
+                            <div style="font-size: 0.75rem; color: #f9a825; margin-top: 5px; font-weight: bold;">
+                                <i class="fas fa-clock"></i> Grace Extension Requested
+                            </div>
+                        @elseif($payment->grace_extension_status == 'rejected')
+                            <div style="font-size: 0.75rem; color: #c62828; margin-top: 5px; font-weight: bold;">
+                                <i class="fas fa-times-circle"></i> Extension Rejected
+                            </div>
                         @endif
                     </td>
                     <td style="padding: 1.5rem 2rem; text-align: right;">

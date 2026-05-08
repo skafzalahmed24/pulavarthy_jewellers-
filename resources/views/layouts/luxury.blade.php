@@ -136,7 +136,7 @@
                 <h4>Store Location</h4>
                 <p><i class="fas fa-map-marker-alt" style="color: var(--accent-color); margin-right: 10px;"></i> Pulavarthy
                     Jewellers, Temple St, Kakinada, Andhra Pradesh 533001</p>
-                <p><i class="fas fa-phone" style="color: var(--accent-color); margin-right: 10px;"></i> 089776 91008
+                <p><i class="fas fa-phone" style="color: var(--accent-color); margin-right: 10px;"></i> 89776 91008
                 </p>
                 <p><i class="fas fa-envelope" style="color: var(--accent-color); margin-right: 10px;"></i>
                     contact@pulavarthyjewellers.com</p>

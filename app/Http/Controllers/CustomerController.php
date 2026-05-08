@@ -14,7 +14,8 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = User::where('is_admin', false)->latest()->paginate(10);
-        return view('admin.customers.index', compact('customers'));
+        $prices = \App\Models\MetalPrice::all()->keyBy('metal_name');
+        return view('admin.customers.index', compact('customers', 'prices'));
     }
 
     /**
@@ -42,7 +43,7 @@ class CustomerController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'nullable|string|email|max:255|unique:users',
             'mobile' => 'required|string|unique:users',
             'password' => 'required|string|min:8',
         ]);
@@ -97,7 +98,7 @@ class CustomerController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $customer->id,
+            'email' => 'nullable|string|email|max:255|unique:users,email,' . $customer->id,
             'mobile' => 'required|string|unique:users,mobile,' . $customer->id,
             'status' => 'required|in:pending,approved,rejected',
             'address' => 'nullable|string|max:255',
@@ -164,7 +165,8 @@ class CustomerController extends Controller
         $scheme = $customer->userSchemes()->first();
         $payments = $scheme ? $scheme->payments()->orderBy('due_date', 'asc')->get() : collect([]);
 
-        return view('admin.customers.payments', compact('customer', 'payments'));
+        $prices = \App\Models\MetalPrice::all()->keyBy('metal_name');
+        return view('admin.customers.payments', compact('customer', 'payments', 'prices'));
     }
 
     /**

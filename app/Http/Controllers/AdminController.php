@@ -34,7 +34,8 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        return view('admin.dashboard');
+        $prices = \App\Models\MetalPrice::all()->keyBy('metal_name');
+        return view('admin.dashboard', compact('prices'));
     }
 
     // Prices Management
@@ -53,17 +54,48 @@ class AdminController extends Controller
             'silver_yesterday' => 'required|numeric',
         ]);
 
-        \App\Models\MetalPrice::updateOrCreate(
-        ['metal_name' => 'Gold'],
-        ['today_price' => $request->gold_today, 'yesterday_price' => $request->gold_yesterday]
-        );
+        $currentGold = \App\Models\MetalPrice::where('metal_name', 'Gold')->first();
+        if (!$currentGold || (float)$currentGold->today_price != (float)$request->gold_today || (float)$currentGold->yesterday_price != (float)$request->gold_yesterday) {
+            \App\Models\MetalPrice::updateOrCreate(
+                ['metal_name' => 'Gold'],
+                ['today_price' => $request->gold_today, 'yesterday_price' => $request->gold_yesterday]
+            );
+            if (!$currentGold || (float)$currentGold->today_price != (float)$request->gold_today) {
+                \App\Models\PriceHistory::create([
+                    'metal_name' => 'Gold',
+                    'price' => $request->gold_today
+                ]);
+            }
+        }
 
-        \App\Models\MetalPrice::updateOrCreate(
-        ['metal_name' => 'Silver'],
-        ['today_price' => $request->silver_today, 'yesterday_price' => $request->silver_yesterday]
-        );
+        $currentSilver = \App\Models\MetalPrice::where('metal_name', 'Silver')->first();
+        if (!$currentSilver || (float)$currentSilver->today_price != (float)$request->silver_today || (float)$currentSilver->yesterday_price != (float)$request->silver_yesterday) {
+            \App\Models\MetalPrice::updateOrCreate(
+                ['metal_name' => 'Silver'],
+                ['today_price' => $request->silver_today, 'yesterday_price' => $request->silver_yesterday]
+            );
+            if (!$currentSilver || (float)$currentSilver->today_price != (float)$request->silver_today) {
+                \App\Models\PriceHistory::create([
+                    'metal_name' => 'Silver',
+                    'price' => $request->silver_today
+                ]);
+            }
+        }
 
         return back()->with('success', 'Market prices updated successfully.');
+    }
+
+    public function priceHistoryIndex(Request $request)
+    {
+        $query = \App\Models\PriceHistory::query();
+
+        if ($request->filled('type')) {
+            $query->where('metal_name', $request->type);
+        }
+
+        $histories = $query->latest()->paginate(10);
+
+        return view('admin.prices.history', compact('histories'));
     }
 
     // Terms Management

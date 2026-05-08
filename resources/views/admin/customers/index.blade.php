@@ -13,6 +13,24 @@
     </a>
 </div>
 
+<!-- Rates Quick View -->
+<div class="grid-container grid-2" style="margin-bottom: 2rem;">
+    <div class="luxury-card" style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="font-size: 3rem; color: #f7d08a;"><i class="fas fa-coins"></i></div>
+        <div>
+            <h4 style="margin: 0; font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Current Gold Rate</h4>
+            <div style="font-size: 1.8rem; font-weight: 700; color: var(--heading-color); margin-top: 0.3rem;">₹{{ isset($prices) && $prices->has('Gold') ? $prices['Gold']->today_price : '--' }} <small style="font-size: 1rem; font-weight: normal; color: var(--text-secondary);">/ g</small></div>
+        </div>
+    </div>
+    <div class="luxury-card" style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="font-size: 3rem; color: #c0c0c0;"><i class="fas fa-coins"></i></div>
+        <div>
+            <h4 style="margin: 0; font-size: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Current Silver Rate</h4>
+            <div style="font-size: 1.8rem; font-weight: 700; color: var(--heading-color); margin-top: 0.3rem;">₹{{ isset($prices) && $prices->has('Silver') ? $prices['Silver']->today_price : '--' }} <small style="font-size: 1rem; font-weight: normal; color: var(--text-secondary);">/ g</small></div>
+        </div>
+    </div>
+</div>
+
 
 @if(session('success'))
 <div class="luxury-card alert-auto-dismiss"

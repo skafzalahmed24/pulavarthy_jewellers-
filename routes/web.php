@@ -53,6 +53,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('content')->group(function () {
                     Route::get('/prices', [App\Http\Controllers\AdminController::class , 'pricesIndex'])->name('admin.prices.index');
                     Route::post('/prices', [App\Http\Controllers\AdminController::class , 'pricesUpdate'])->name('admin.prices.update');
+                    Route::get('/prices/history', [App\Http\Controllers\AdminController::class , 'priceHistoryIndex'])->name('admin.prices.history');
 
                     Route::get('/terms', [App\Http\Controllers\AdminController::class , 'termsIndex'])->name('admin.terms.index');
                     Route::post('/terms', [App\Http\Controllers\AdminController::class , 'termsUpdate'])->name('admin.terms.update');
@@ -90,6 +91,9 @@ Route::prefix('admin')->group(function () {
                 Route::get('/analytics/status', [App\Http\Controllers\Admin\AdminAnalyticsController::class , 'getStatusData'])->name('admin.analytics.status');
                 Route::get('/analytics/growth', [App\Http\Controllers\Admin\AdminAnalyticsController::class , 'getGrowthData'])->name('admin.analytics.growth');
                 Route::get('/analytics/payment', [App\Http\Controllers\Admin\AdminAnalyticsController::class , 'getPaymentData'])->name('admin.analytics.payment');
+
+                // Reports
+                Route::get('/reports/pending-payments', [App\Http\Controllers\Admin\ReportController::class, 'pendingPayments'])->name('admin.reports.pending_payments');
 
                 Route::post('/logout', [App\Http\Controllers\AdminController::class , 'logout'])->name('admin.logout');
             }

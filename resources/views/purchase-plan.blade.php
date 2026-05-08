@@ -17,11 +17,18 @@
     </div>
     @endif
 
+    @php
+        $activeTab = 'pay-now';
+        if ($errors->any() && !$errors->has('mobile')) {
+            $activeTab = 'join-new';
+        }
+    @endphp
+
     <div class="tabs-nav">
-        <button class="tab-btn active" data-tab="pay-now">PAY NOW</button>
+        <button class="tab-btn {{ $activeTab == 'pay-now' ? 'active' : '' }}" data-tab="pay-now">{{ auth()->check() ? 'PAY NOW' : 'LOGIN NOW' }}</button>
         @guest
         <button class="tab-btn" data-tab="explore-plan">EXPLORE PLANS</button>
-        <button class="tab-btn" data-tab="join-new">JOIN NEW PLAN</button>
+        <button class="tab-btn {{ $activeTab == 'join-new' ? 'active' : '' }}" data-tab="join-new">SIGN UP</button>
         @endguest
         @auth
         @if(!auth()->user()->is_admin)
@@ -32,7 +39,7 @@
     </div>
 
     <!-- PAY NOW TAB -->
-    <div id="pay-now" class="tab-content active">
+    <div id="pay-now" class="tab-content {{ $activeTab == 'pay-now' ? 'active' : '' }}">
         @php
             $showOnboardingFlow = auth()->check()
                 && !auth()->user()->is_admin
@@ -106,7 +113,7 @@
                                 <span class="amount">₹ {{ number_format($baseDeposit) }}</span>
                             </div>
                             <div class="grid-item full-width">
-                                <label>Approx. Gold Weight (Today's 24K Rate)</label>
+                                <label>Approx. Gold Weight (Today's 22K Rate)</label>
                                 <span class="weight">
                                     {{ $todaysGoldRate > 0 ? number_format($baseDeposit / $todaysGoldRate, 3) : 0 }} g <small>(@ ₹{{ number_format($todaysGoldRate) }}/g)</small>
                                 </span>
@@ -184,7 +191,7 @@
                             <div class="form-group" style="margin: 0;">
                                 <label
                                     style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; opacity: 0.7;">Current
-                                    Gold Rate (24K)</label>
+                                    Gold Rate (22K)</label>
                                 <div
                                     style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; border-radius: 10px; font-weight: 700; color: #27ae60;">
                                     ₹ <span id="current-gold-rate">{{ $todaysGoldRate > 0 ? number_format($todaysGoldRate) : '--' }}</span> / g
@@ -388,7 +395,7 @@
                                     </div>
 
                                     <div class="luxury-card step-surface">
-                                        <h5 class="step-section-title">Delivery details</h5>
+                                        <h5 class="step-section-title">Address details</h5>
 
                                         <div id="address-list">
                                             @php
@@ -462,6 +469,7 @@
                                         <div id="plan-preview-box" class="plan-preview" style="display: none;">
                                             <p style="margin: 0; font-size: 0.95rem; color: var(--text-secondary); display: flex; justify-content: space-between;">Term: <strong id="preview-term-txt" style="color: var(--heading-color);">--</strong></p>
                                             <p style="margin: 0.5rem 0 0; font-size: 0.95rem; color: var(--text-secondary); display: flex; justify-content: space-between;">Total Investment: <strong id="preview-total-txt" style="color: var(--accent-color);">--</strong></p>
+                                            <p style="margin: 0.5rem 0 0; font-size: 0.95rem; color: var(--text-secondary); display: flex; justify-content: space-between;">Approx. Gold Weight (22K Rate): <strong id="preview-weight-txt" style="color: #27ae60;">--</strong></p>
                                         </div>
                                     </div>
 
@@ -498,7 +506,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Nominee Relationship*</label>
-                                                <select name="nominee_relationship" class="form-control" required id="nominee_rel_val">
+                                                <select name="nominee_relationship" class="form-control" required id="nominee_rel_val" onchange="if(this.value === 'Other'){document.getElementById('other_rel_group').style.display='block';document.getElementById('other_rel_val').required=true;document.getElementById('other_rel_val').name='nominee_relationship';this.removeAttribute('name');}else{document.getElementById('other_rel_group').style.display='none';document.getElementById('other_rel_val').required=false;document.getElementById('other_rel_val').removeAttribute('name');this.name='nominee_relationship';}">
                                                     <option value="" disabled selected>-- Select Relationship --</option>
                                                     <option value="Father">Father</option>
                                                     <option value="Mother">Mother</option>
@@ -522,13 +530,17 @@
                                                     <option value="Other">Other</option>
                                                 </select>
                                             </div>
+                                            <div class="form-group" id="other_rel_group" style="display: none;">
+                                                <label>Specify Relationship*</label>
+                                                <input type="text" id="other_rel_val" class="form-control" placeholder="e.g. Partner">
+                                            </div>
                                             <div class="form-group">
                                                 <label>Nominee Contact Number*</label>
                                                 <input type="tel" name="nominee_contact" class="form-control" placeholder="10 digits" pattern="[0-9]{10}" required id="nominee_tel_val">
                                             </div>
                                             <div class="form-group">
-                                                <label>Choose date of birth*</label>
-                                                <input type="date" name="dob" class="form-control" required id="dob_val">
+                                                <label>Choose date of birth</label>
+                                                <input type="date" name="dob" class="form-control" id="dob_val">
                                             </div>
                                             <div class="form-group">
                                                 <label>Wedding Anniversary</label>
@@ -795,15 +807,15 @@
                                 }
                                 const amountInput = getEl('monthly_amount_input');
                                 const amount = amountInput ? parseFloat(amountInput.value) : 0;
-                                if(amount < 3000) {
-                                    alert('Minimum investment amount is ₹3,000.');
+                                if(amount < 5000) {
+                                    alert('Minimum investment amount is ₹5,000.');
                                     return;
                                 }
                             }
                             if (currentStep === 3) {
                                 const required = [
                                     'identity_proof_input', 'nominee_name_val', 'nominee_rel_val', 
-                                    'nominee_tel_val', 'dob_val'
+                                    'nominee_tel_val'
                                 ];
                                 for(let id of required) {
                                     const el = getEl(id);
@@ -811,6 +823,10 @@
                                         alert('Please fill all required fields marked with *');
                                         return;
                                     }
+                                }
+                                if(getEl('nominee_rel_val').value === 'Other' && !getVal('other_rel_val')) {
+                                    alert('Please specify the relationship.');
+                                    return;
                                 }
                                 const bankAcc = getVal('bank_acc_val');
                                 const bankAccConfirm = getVal('bank_acc_confirm_val');
@@ -882,7 +898,7 @@
                         setTxt('sum-plan', selectedOption ? selectedOption.getAttribute('data-name') : '--');
                         setTxt('sum-amount', '₹ ' + amount.toLocaleString());
                         
-                        setTxt('sum-nominee', getVal('nominee_name_val') + ' (' + getVal('nominee_rel_val') + ')');
+                        setTxt('sum-nominee', getVal('nominee_name_val') + ' (' + (getVal('nominee_rel_val') === 'Other' ? getVal('other_rel_val') : getVal('nominee_rel_val')) + ')');
                         setTxt('sum-id', getVal('id_type_val') + ': ' + getVal('identity_proof_input'));
                         
                         const panItem = document.getElementById('sum-pan-item');
@@ -997,6 +1013,8 @@
                         const previewBox = document.getElementById('plan-preview-box');
                         const previewTerm = document.getElementById('preview-term-txt');
                         const previewTotal = document.getElementById('preview-total-txt');
+                        const previewWeight = document.getElementById('preview-weight-txt');
+                        const rate = {{ $todaysGoldRate > 0 ? $todaysGoldRate : 0 }};
 
                         if (termTxt) {
                             previewBox.style.display = 'block';
@@ -1006,11 +1024,21 @@
                             const currentAmount = parseFloat(amountInput.value) || 0;
                             const total = termNum * currentAmount;
                             previewTotal.innerText = '₹ ' + total.toLocaleString();
+                            if (rate > 0 && currentAmount > 0) {
+                                previewWeight.innerText = (currentAmount / rate).toFixed(3) + ' g';
+                            } else {
+                                previewWeight.innerText = '--';
+                            }
 
                             amountInput.oninput = function() {
                                 const newAmount = parseFloat(this.value) || 0;
                                 const newTotal = termNum * newAmount;
                                 previewTotal.innerText = '₹ ' + newTotal.toLocaleString();
+                                if (rate > 0 && newAmount > 0) {
+                                    previewWeight.innerText = (newAmount / rate).toFixed(3) + ' g';
+                                } else {
+                                    previewWeight.innerText = '--';
+                                }
                                 togglePanRequirement(newAmount);
                             };
                         } else {
@@ -1071,7 +1099,7 @@
                     @csrf
                     <div class="form-group">
                         <label><i class="fas fa-mobile-alt" style="margin-right: 8px;"></i> Registered Mobile</label>
-                        <input type="tel" name="mobile" class="form-control" placeholder="Enter your mobile number" pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" required>
+                        <input type="tel" name="mobile" class="form-control" placeholder="Enter your mobile number" pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" value="{{ old('mobile') }}" required>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-lock" style="margin-right: 8px;"></i> Password</label>
@@ -1153,10 +1181,10 @@
     </div>
 
     <!-- JOIN NEW PLAN TAB -->
-    <div id="join-new" class="tab-content">
+    <div id="join-new" class="tab-content {{ $activeTab == 'join-new' ? 'active' : '' }}">
         <div style="max-width: 600px; margin: 0 auto;">
             <div class="luxury-card">
-                <h2 style="margin-bottom: 3rem; text-align: center;">New Membership Application</h2>
+                <h2 style="margin-bottom: 3rem; text-align: center;">Create your account</h2>
 
                 @if($errors->any() && !$errors->has('mobile'))
                 <div class="luxury-card"
@@ -1179,15 +1207,15 @@
                             <div class="form-group">
                                 <label>Full Name</label>
                                 <input type="text" name="name" class="form-control" placeholder="Enter first and last name"
-                                    required>
+                                    value="{{ old('name') }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Mobile Number</label>
-                                <input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                                <input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" pattern="[0-9]{10}" value="{{ old('mobile') }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Email Address</label>
-                                <input type="email" name="email" class="form-control" placeholder="name@email.com" required>
+                                <input type="email" name="email" class="form-control" placeholder="name@email.com" value="{{ old('email') }}">
                             </div>
                             <div class="form-group">
                                 <label>Account Password</label>
@@ -1319,7 +1347,7 @@
                 <form action="{{ route('customer.login') }}" method="POST">
                     @csrf
                     <div class="form-group">
-                        <input type="tel" name="mobile" class="form-control" placeholder="Mobile Number" required>
+                        <input type="tel" name="mobile" class="form-control" placeholder="Mobile Number" value="{{ old('mobile') }}" required>
                     </div>
                     <div class="form-group">
                         <div style="position: relative;">

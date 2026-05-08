@@ -27,7 +27,7 @@ class LoginController extends Controller
         }
 
         if ($user->status === 'rejected') {
-            return back()->withErrors(['mobile' => 'Your account is rejected by the owner. Kindly reach out to <a href="tel:9154175992" style="color: #c53030; text-decoration: underline; font-weight: 700;">9154175992</a>']);
+            return back()->withErrors(['mobile' => 'Your account is rejected by the owner. Kindly reach out to <a href="tel:8977691008" style="color: #c53030; text-decoration: underline; font-weight: 700;">8977691008</a>']);
         }
 
         if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {

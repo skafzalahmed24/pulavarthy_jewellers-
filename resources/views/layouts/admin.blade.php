@@ -438,6 +438,18 @@
             </li>
 
             <li class="nav-item" style="margin-top: 1.5rem;">
+                <span style="color: rgba(255,255,255,0.4); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; padding-left: 1.5rem; font-weight: 700;">Reports</span>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('admin.reports.pending_payments') }}"
+                    class="nav-link {{ request()->routeIs('admin.reports.pending_payments') ? 'active' : '' }}">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Pending Payments</span>
+                </a>
+            </li>
+
+            <li class="nav-item" style="margin-top: 1.5rem;">
                 <span
                     style="color: rgba(255,255,255,0.4); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; padding-left: 1.5rem; font-weight: 700;">Content
                     Management</span>
@@ -445,9 +457,17 @@
 
             <li class="nav-item">
                 <a href="{{ route('admin.prices.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.prices.*') ? 'active' : '' }}">
+                    class="nav-link {{ request()->routeIs('admin.prices.index') ? 'active' : '' }}">
                     <i class="fas fa-coins"></i>
                     <span>Update Price</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('admin.prices.history') }}"
+                    class="nav-link {{ request()->routeIs('admin.prices.history') ? 'active' : '' }}">
+                    <i class="fas fa-history"></i>
+                    <span>Price History</span>
                 </a>
             </li>
 
@@ -480,7 +500,9 @@
                 </a>
             </div>
             <div class="user-profile">
-                <!-- <span style="font-weight: 600;">{{ auth()->user()->name }}</span> -->
+                <a href="{{ route('admin.dashboard') }}" class="logout-btn" style="text-decoration: none; margin-right: 15px;">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
                 <form action="{{ route('admin.logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="logout-btn">
